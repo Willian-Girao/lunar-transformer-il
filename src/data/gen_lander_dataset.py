@@ -1,6 +1,14 @@
 import pickle, torch, os, re
 import numpy as np
 from src.models.datasets.LanderDataset import LanderDataset
+import argparse
+
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('--training_seq_len', type=int, help='Number of sequential state vectors and actions interleaved to create an input sequence. Must be an even integer greater than 2.', default=12)
+args = parser.parse_args()
+
+if args.training_seq_len <= 2 or args.training_seq_len % 2 != 0:
+    raise ValueError(f'--training_seq_len must be an even integer greater than 2 (got {args.training_seq_len}).')
 
 # Load the raw data
 # -------------------------------------------
@@ -16,7 +24,7 @@ match = re.search(r"-(\d+)\.pickle$", dataset_name)
 if match:
     nb_train_episodes = int(match.group(1))
 
-training_seq_len = 12 # 12
+training_seq_len = args.training_seq_len
 
 # Normalize state space vectors
 # -------------------------------------------

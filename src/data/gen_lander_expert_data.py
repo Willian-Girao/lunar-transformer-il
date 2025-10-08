@@ -15,9 +15,10 @@ import argparse
 
 np.bool = np.bool_
 
-parser = argparse.ArgumentParser(description ='Process some integers.')
+parser = argparse.ArgumentParser(description='')
 parser.add_argument('--max_steps', type=int, help='Maximum number of steps an episode can last.', default=400)
 parser.add_argument('--nb_episodes', type=int, help='Number of episodes.', default=1000)
+args = parser.parse_args()
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -30,8 +31,6 @@ policy = ActorCritic()
 policy.load_state_dict(torch.load(
     os.path.join(project_root, 'src', 'models', 'lander_actor_critic', 'actorcritic_lunarlander', 'LunarLander_TWO.pth'))
 )
-
-args = parser.parse_args()
 
 max_steps = args.max_steps
 nb_episodes = args.nb_episodes
