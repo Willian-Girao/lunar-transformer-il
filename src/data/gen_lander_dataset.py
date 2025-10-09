@@ -5,6 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--training_seq_len', type=int, help='Number of sequential state vectors and actions interleaved to create an input sequence. Must be an even integer greater than 2.', default=12)
+parser.add_argument("--normalize", action="store_true", help='Whether or not the first 6 dimensions of the state space vectors are normalized.')
 args = parser.parse_args()
 
 if args.training_seq_len <= 2 or args.training_seq_len % 2 != 0:
@@ -24,19 +25,17 @@ match = re.search(r"-(\d+)\.pickle$", dataset_name)
 if match:
     nb_train_episodes = int(match.group(1))
 
-training_seq_len = args.training_seq_len
-
 # Normalize state space vectors
 # -------------------------------------------
+if args.normalize:
+    continuous_states = lunarland_expert_data['X'][..., :6]  # take first 6 features
 
-continuous_states = lunarland_expert_data['X'][..., :6]  # take first 6 features
+    # Compute mean and std across all samples and timesteps (flatten N and T)
+    mean = continuous_states.mean(axis=(0, 1), keepdims=True)  # shape (1,1,6)
+    std  = continuous_states.std(axis=(0, 1), keepdims=True)
 
-# Compute mean and std across all samples and timesteps (flatten N and T)
-mean = continuous_states.mean(axis=(0, 1), keepdims=True)  # shape (1,1,6)
-std  = continuous_states.std(axis=(0, 1), keepdims=True)
-
-# Normalize in-place
-lunarland_expert_data['X'][..., :6] = (continuous_states - mean) / std
+    # Normalize in-place
+    lunarland_expert_data['X'][..., :6] = (continuous_states - mean) / std
 
 # Compute sample weights from rewards
 # -------------------------------------------
@@ -57,9 +56,10 @@ dataset = LanderDataset(
     actions=lunarland_expert_data['Y'],
     padding_start=lunarland_expert_data['padding_idxs'],
     weights=weights,
-    seq_len=training_seq_len)
+    seq_len=args.training_seq_len,
+    normalized=args.normalize)
 
-file_name = dataset_name.replace('.pkl', f'-{training_seq_len}.pt')
+file_name = dataset_name.replace('.pkl', f'-{args.training_seq_len}.pt')
 path = os.path.join(project_root, 'data', 'processed', file_name)
 torch.save(dataset, path)
 print(f'... exported to: {path}')

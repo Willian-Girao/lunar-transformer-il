@@ -3,7 +3,7 @@ from torch.utils.data import Dataset
 import numpy as np
 
 class LanderDataset(Dataset):
-    def __init__(self, states, actions, padding_start, weights, seq_len):
+    def __init__(self, states, actions, padding_start, weights, seq_len, normalized):
         """
         states: an array with shape (nb_episods, nb_steps, state_dim)
         actions: an array with shape (nb_episods, nb_steps,)
@@ -14,6 +14,7 @@ class LanderDataset(Dataset):
         self.labels = []
         self.token_mask = []
         self.weights = []
+        self.normalized = normalized
 
         if seq_len % 2 != 0:
             raise ValueError(f'The argument "seq_len" has to be even (received {seq_len}).')
