@@ -1,0 +1,7 @@
+Configuration files that define experiment settings — separate code from hyperparameters.
+YAML / JSON configs for each stage or experiment type.
+Examples:
+- transformer_baseline.yaml
+- transformer_noisy.yaml
+- actor_critic.yaml
+- data_generation.yaml

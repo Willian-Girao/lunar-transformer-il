@@ -1,0 +1,40 @@
+All source code — your implementation lives here. 
+This folder makes the project importable as a Python package (import src.training.train_transformer).
+
+src/data
+
+Python code related to data handling, not the data itself.
+- dataset.py → PyTorch Dataset class for transformer training
+- preprocess.py → normalization, tokenization, and saving processed data
+- split.py → train/val/test split logic
+
+src/evaluation/
+
+Scripts for evaluating trained models.
+- eval_baseline.py → evaluate transformer on original environment
+- eval_generalization.py → test under changed parameters (e.g., gravity)
+- metrics.py → success rate, landing stability, etc.
+
+src/models/
+
+Neural network architectures and model definitions.
+
+Example files:
+- actor_critic.py
+- policy_network.py
+- value_network.py
+
+src/training/
+
+Model training logic.
+- train_actor_critic.py → train the RL expert
+- train_transformer.py → train transformer on expert trajectories
+- losses.py → custom loss functions (optional)
+
+src/utils/
+
+Reusable helper functions.
+- logger.py → logging utilities
+- plotting.py → Matplotlib functions for results
+- seed.py → random seed setup
+- config_parser.py → load YAML configs

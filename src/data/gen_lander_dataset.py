@@ -1,6 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+###########################################################################
+#																		  #
+# @author: w.soares.girao@rug.nl 										  #
+# @university: University of Groningen 									  #
+# @group: Bio-Inspired Circuits and Systems (BICS) 						  #
+#																		  #
+###########################################################################
+"""
 import pickle, torch, os, re
 import numpy as np
-from src.models.datasets.LanderDataset import LanderDataset
+from LanderDataset import LanderDataset
 import argparse
 
 parser = argparse.ArgumentParser(description='')

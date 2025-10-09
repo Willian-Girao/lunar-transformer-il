@@ -1,0 +1,8 @@
+Lightweight “entry points” to run common tasks (makes your repo reproducible and professional).
+Shell (.sh) or batch (.bat) scripts for reproducibility:
+- run_data_gen.sh → runs expert trajectory generation
+- train_transformer.sh → launches training with configs
+- evaluate_generalization.sh → runs tests on modified gravity environments
+Example content:
+# scripts/train_transformer.sh
+python -m src.training.train_transformer --config configs/transformer_baseline.yaml

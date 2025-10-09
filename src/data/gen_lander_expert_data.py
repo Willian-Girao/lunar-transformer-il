@@ -12,7 +12,9 @@ import gymnasium as gym
 import torch, pickle, os
 import numpy as np
 import argparse
-
+from src.models.lander_actor_critic.ActorCritic import ActorCritic
+import warnings
+warnings.filterwarnings("ignore")
 np.bool = np.bool_
 
 parser = argparse.ArgumentParser(description='')
@@ -20,21 +22,19 @@ parser.add_argument('--max_steps', type=int, help='Maximum number of steps an ep
 parser.add_argument('--nb_episodes', type=int, help='Number of episodes.', default=1000)
 args = parser.parse_args()
 
-import warnings
-warnings.filterwarnings("ignore")
-
-from src.models.lander_actor_critic.ActorCritic import ActorCritic
-
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
+# Configuration
+# -------------------------------------------
+max_steps = args.max_steps
+nb_episodes = args.nb_episodes
+
+# Instantiate Actor-Critic model
+# -------------------------------------------
 policy = ActorCritic()
 policy.load_state_dict(torch.load(
     os.path.join(project_root, 'src', 'models', 'lander_actor_critic', 'actorcritic_lunarlander', 'LunarLander_TWO.pth'))
 )
-
-max_steps = args.max_steps
-nb_episodes = args.nb_episodes
-human_mode = False
 
 export_path = os.path.join(project_root, 'data', 'raw')
 
@@ -48,7 +48,7 @@ lunarlander_training_data = {'X': [], 'padding_idxs': [], 'Y': [], 'rewards': []
 seed = 0
 while len(lunarlander_training_data['X']) < nb_episodes:
     steps = 0
-    env = gym.make("LunarLander-v3", render_mode="human" if human_mode else None)
+    env = gym.make("LunarLander-v3", render_mode=None)
 
     np.random.seed(seed)
     observation, info = env.reset(seed=seed)
@@ -95,7 +95,7 @@ while len(lunarlander_training_data['X']) < nb_episodes:
     print(f'Episodes: {percent:03}%', end='\r', flush=True)
 
 # Save data to file
-# -----------------
+# -------------------------------------------
 lunarlander_training_data['X'] = np.array(lunarlander_training_data['X'])
 lunarlander_training_data['padding_idxs'] = np.array(lunarlander_training_data['padding_idxs'])
 lunarlander_training_data['Y'] = np.array(lunarlander_training_data['Y'])

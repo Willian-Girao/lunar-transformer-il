@@ -1,0 +1,6 @@
+Exploratory analysis, visualizations, and experiments.
+Interactive notebooks for debugging or analysis:
+- inspect_trajectories.ipynb
+- plot_training_curves.ipynb
+- visualize_generalization.ipynb
+These are not part of the main pipeline, but useful for documentation and demonstration.
