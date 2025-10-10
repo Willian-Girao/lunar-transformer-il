@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 import torch
 from torch.utils.data import Dataset
-import numpy as np
 
 class LanderDataset(Dataset):
-    def __init__(self, states, actions, padding_start, weights, seq_len, normalized):
+    def __init__(self, states, actions, padding_start, weights, seq_len, normalized, mean=None, std=None):
         """
         states: an array with shape (nb_episods, nb_steps, state_dim)
         actions: an array with shape (nb_episods, nb_steps,)
@@ -14,7 +14,10 @@ class LanderDataset(Dataset):
         self.labels = []
         self.token_mask = []
         self.weights = []
+        
         self.normalized = normalized
+        self.mean = mean
+        self.std = std
 
         if seq_len % 2 != 0:
             raise ValueError(f'The argument "seq_len" has to be even (received {seq_len}).')
@@ -57,3 +60,8 @@ class LanderDataset(Dataset):
         # the embedding layer of the transformer will turn
         # `states_seq` and `actions_seq` into a single input sequence.
         return states_seq, actions_seq, label, mask, reward
+    
+    def get_classes_weights(self):
+        class_counts = torch.bincount(torch.tensor(self.labels))
+        class_weights = 1.0 / class_counts.float()
+        return class_weights

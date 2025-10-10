@@ -1,0 +1,14 @@
+{
+    "name": "baseline_transformer",
+    "nb_actions": 4,
+    "state_space_dim": 8,
+    "training_seq_len": 12,
+    "embedding_dim": 32,
+    "token_types": 2,
+    "num_attention_heads": 2,
+    "intermediate_dim": 128,
+    "hidden_dropout_prob": 0.5,
+    "depth": 2,
+    "noise_type": "none",
+    "seed": 0
+}
