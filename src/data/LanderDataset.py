@@ -15,6 +15,7 @@ class LanderDataset(Dataset):
         self.token_mask = []
         self.weights = []
         
+        self.seq_len = seq_len
         self.normalized = normalized
         self.mean = mean
         self.std = std

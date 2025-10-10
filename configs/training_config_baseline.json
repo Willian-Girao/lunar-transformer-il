@@ -1,9 +1,8 @@
 {   
-    "seed": 0,
-    "dataset": "gymnasium-ActorCritic-LunarLander-10-12.pt",
+    "dataset": "gymnasium-ActorCritic-LunarLander-1000-12.pt",
     "learning_rate": 1e-3,
     "batch_size": 32,
     "data_shuffle": true,
-    "epochs": 2,
+    "epochs": 40,
     "progress": true
 }

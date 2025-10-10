@@ -34,8 +34,12 @@ def main():
     # -------------------------------------------
     # We load a custom Dataset subclass. Requires pickle, so weights_only=False is necessary.
     # The file is locally generated and trusted.
-    torch.manual_seed(model_cfg.seed)
     dataset = torch.load(os.path.join(project_root, 'data', 'processed', train_cfg.dataset), weights_only=False)
+
+    if dataset.seq_len != model_cfg.training_seq_len:
+        raise ValueError(f'Dataset sequence length ({dataset.seq_len}) differs from the sequence length set for the transformer ({model_cfg.training_seq_len}).')
+
+    torch.manual_seed(model_cfg.seed)
     train_dataloader = DataLoader(dataset, batch_size=train_cfg.batch_size, shuffle=train_cfg.data_shuffle)
 
     # Instantiate model
