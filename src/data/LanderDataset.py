@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import Dataset
 
 class LanderDataset(Dataset):
-    def __init__(self, states, actions, padding_start, weights, seq_len, normalized, mean=None, std=None):
+    def __init__(self, states, actions, padding_start, weights, seq_len, normalized, mean=None, std=None, overlapping_seqs=True):
         """
         states: an array with shape (nb_episods, nb_steps, state_dim)
         actions: an array with shape (nb_episods, nb_steps,)
@@ -19,19 +19,19 @@ class LanderDataset(Dataset):
         self.normalized = normalized
         self.mean = mean
         self.std = std
+        self.overlapping_seqs = overlapping_seqs
 
         if seq_len % 2 != 0:
             raise ValueError(f'The argument "seq_len" has to be even (received {seq_len}).')
-
-        # Interleaving states and actions.
-        stride = seq_len // 2
+        
+        stride = seq_len // 2 # to interleaving states and actions.
+        stride_step = 1 if overlapping_seqs else stride # overlapping or disjoint windows to create sequences chunks.
 
         # Creating training sequences and labels (actions) for each individual episode.
         for idx, episode in enumerate(states):
-            for i in range(0, len(episode) - stride):
-                # index withing both `actions` and `states` where elements in the array were placed as padding.
-                pad_idx = padding_start[idx]
-
+            # index withing both `actions` and `states` where elements in the array were placed as padding.
+            pad_idx = padding_start[idx]
+            for i in range(0, len(episode) - stride, stride_step):
                 # a sequence can not be composed of only padded elements (tho padding might start somewhere within this sequence).
                 if i < pad_idx:
                     # take sub-sequence of length `stride`
