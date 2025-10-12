@@ -6,4 +6,4 @@ os.chdir(project_root) # change working directory to project root.
 
 # adding the '--normalize' argument pravents state space vectors from being normalized. 
 # adding the '--overlapping_seqs' argument builds disjoint training sequences (no sliding window).
-os.system(f'"{sys.executable}" -m src.data.gen_lander_dataset --training_seq_len 12 --overlapping_seqs')
+os.system(f'"{sys.executable}" -m src.data.gen_lander_dataset --training_seq_len 16')

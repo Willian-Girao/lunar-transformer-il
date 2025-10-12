@@ -43,3 +43,9 @@ class TestingConfig(dict):
         # within `json_config`.
         for key in json_config.keys():
             self[key] = json_config[key]
+
+    def from_dict(self, dict: dict) -> None:
+        """
+        """
+        for key in dict.keys():
+            self[key] = dict[key]     

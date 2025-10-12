@@ -45,4 +45,4 @@ class TrainingConfig(dict):
         # Loop over the attributes of `TrainingConfig` and try to look them up
         # within `json_config`.
         for key in json_config.keys():
-            self[key] = json_config[key]
+            self[key] = json_config[key] 

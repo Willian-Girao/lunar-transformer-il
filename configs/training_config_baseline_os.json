@@ -3,7 +3,7 @@
     "learning_rate": 1e-3,
     "batch_size": 32,
     "data_shuffle": true,
-    "epochs": 40,
+    "epochs": 50,
     "progress": true,
     "subset_dataset": [false, 0]
 }

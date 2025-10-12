@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import torch.nn as nn
 import torch
+import math
 
 class NoisyLinear(nn.Module):
     """
@@ -9,25 +10,25 @@ class NoisyLinear(nn.Module):
         super().__init__()
 
         self.size_in, self.size_out = size_in, size_out
-        self.noise_scale = config.noise_scale
+        self.noise_scale = getattr(config, 'noise_scale', 1.0)
 
-        # Use a local generator for reproducible weight initialization
+        # Use a local generator for reproducible weight initialization.
         generator = torch.Generator()
         generator.manual_seed(config.seed)
 
-        # Initialize weights with kaiming_uniform using the generator
-        weights = torch.empty(size_out, size_in)
-        nn.init.kaiming_uniform_(weights, mode='fan_in', nonlinearity='linear')
-        self.weights = nn.Parameter(weights)
+        # Match nn.Linear initialization exactly.
+        self.weights = nn.Parameter(torch.empty(size_out, size_in))
+        nn.init.kaiming_uniform_(self.weights, a=math.sqrt(5), generator=generator)
 
-        # Bias
-        bias = torch.zeros(size_out)
-        self.bias = nn.Parameter(bias)
+        # `nn.Linear` by default initializes bias using the same uniform distribution as weights.
+        bound = 1 / math.sqrt(size_in)
+        self.bias = nn.Parameter(torch.empty(size_out))
+        nn.init.uniform_(self.bias, -bound, bound, generator=generator)
 
-        # Noise function
-        if getattr(config, 'noise_type', 'uniform') == 'uniform':
+        # Noise function.
+        if config.noise_type == 'uniform':
             self.noise_fn = torch.rand
-        elif getattr(config, 'noise_type', 'uniform') == 'normal':
+        elif config.noise_type == 'normal':
             self.noise_fn = torch.randn
             self.noise_std = config.noise_std
             self.noise_mean = config.noise_mean
@@ -39,17 +40,20 @@ class NoisyLinear(nn.Module):
         Args:
          x: Tensor of shape (batch_size, size_in) or (batch_size, seq_len, size_in).
         """
+        # Compute weighted sum (pre-activation before bias).
+        pre_activation = torch.matmul(x, self.weights.t())
+
+        # Add noise *before* bias (i.e., to the pre-activation).
         if self.training and self.noise_fn is not None and noise_seed is not None:
             gen = torch.Generator()
             gen.manual_seed(noise_seed)
-            unit_noise = self.noise_fn(x.size(0), self.size_out, generator=gen) * self.noise_scale
 
-            # Adjust for mean/std if normal
+            # Noise per sample × per neuron.
+            noise = self.noise_fn(x.size(0), self.size_out, generator=gen) * self.noise_scale
+
+            # Adjust for mean/std if normal.
             if self.noise_fn == torch.randn:
-                unit_noise = unit_noise * self.noise_std + self.noise_mean
+                noise = noise * self.noise_std + self.noise_mean
+            pre_activation = pre_activation + noise
 
-            w_times_x = torch.add(torch.matmul(x, self.weights.t()), unit_noise)
-        else:
-            w_times_x = torch.matmul(x, self.weights.t())
-
-        return torch.add(w_times_x, self.bias)
+        return pre_activation + self.bias

@@ -4,7 +4,7 @@ import torch, os
 import random
 import string
 
-def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader) -> None:
+def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader) -> str:
     model_id = generate_checkpoint_id()
     epochs_losses = []
     epoch_iter = range(train_cfg.epochs)
@@ -38,6 +38,8 @@ def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloa
             epoch_iter.set_postfix({'loss': f'{epochs_losses[-1]:.10f}'})
 
         create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses)
+
+    return model_id
 
 def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses):
     """

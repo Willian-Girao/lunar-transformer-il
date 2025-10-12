@@ -1,0 +1,12 @@
+{   
+    "depth": ["choice", [1, 2]],
+    "num_attention_heads": ["choice", [1, 2, 4]],
+    "embedding_dim": ["choice", [32, 64]],
+    "intermediate_dim": ["choice", [64, 128]],
+    "training_seq_len": ["choice", [12, 14, 16]],
+    "testing_seq_len": ["choice", [4, 6, 8]],
+    "lr": ["loguniform", [1e-4, 1e-3]],
+    "batch_size": ["choice", [32]],
+    "hidden_dropout_prob": ["uniform", [0.1, 0.9]] ,
+    "epochs": ["choice", [50]]
+}

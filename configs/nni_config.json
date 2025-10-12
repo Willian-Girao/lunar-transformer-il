@@ -1,0 +1,13 @@
+{   
+    "experiment_name": "HPO_lander_baseline",
+    "tuner_name": "TPE",
+    "optimize_mode": "maximize",
+    "max_trial_number": 300,
+    "trial_concurrency": 1,
+    "port": 8081,
+    "seed": 0,
+    "dataset": "",
+    "nb_test_episodes": 10,
+    "env_noise": false,
+    "reward_per_episode": "total"
+}

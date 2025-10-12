@@ -51,4 +51,10 @@ class TransformerConfig(dict):
         # Loop over the attributes of `TransformerConfig` and try to look them up
         # within `json_config`.
         for key in json_config.keys():
-            self[key] = json_config[key]                
+            self[key] = json_config[key]
+
+    def from_dict(self, dict: dict) -> None:
+        """
+        """
+        for key in dict.keys():
+            self[key] = dict[key]                
