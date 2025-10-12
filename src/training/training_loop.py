@@ -53,11 +53,7 @@ def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, ep
      optimizer: Optimizer instance.
      filename (str): Name of the checkpoint file.
     """
-
-    # Create export folder
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    save_dir = os.path.join(project_root, 'results', 'models', model_id)
-    os.makedirs(save_dir, exist_ok=True)
+    from src.utils.model_handling import save_model
 
     # Convert configs safely to standard dicts
     model_cfg_dict = dict(model_cfg)
@@ -72,10 +68,12 @@ def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, ep
         'epochs_losses': np.array(epochs_losses)
     }
 
-    model_path = os.path.join(save_dir, f'{model_id}-{model_cfg.training_seq_len}-{model_cfg.name}-{train_cfg.epochs}.pth')
-
     # Save checkpoint
-    torch.save(checkpoint, model_path)
+    save_model(
+        checkpoint=checkpoint,
+        model_id=model_id,
+        file_name=f'{model_id}-{model_cfg.training_seq_len}-{model_cfg.name}-{train_cfg.epochs}.pth'
+    )
 
 def generate_checkpoint_id(digs:int=3, chrs:int=2) -> str:
     """

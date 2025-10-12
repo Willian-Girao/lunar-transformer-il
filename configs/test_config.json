@@ -1,0 +1,8 @@
+{   
+    "model": "211ez",
+    "nb_test_episodes": 5,
+    "save_animation": true,
+    "env_noise": [false, ""],
+    "sequence_length": 6,
+    "reward_per_episode": "total"
+}

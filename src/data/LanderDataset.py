@@ -20,6 +20,7 @@ class LanderDataset(Dataset):
         self.mean = mean
         self.std = std
         self.overlapping_seqs = overlapping_seqs
+        self.nb_episodes = states.shape[0]
 
         if seq_len % 2 != 0:
             raise ValueError(f'The argument "seq_len" has to be even (received {seq_len}).')
