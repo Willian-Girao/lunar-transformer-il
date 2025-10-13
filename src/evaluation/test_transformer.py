@@ -21,9 +21,7 @@ def main():
 
     # Test model
     # -------------------------------------------
-    rewards = test(test_cfg)
-
-
+    rewards = test(test_cfg) # return exported to file if flag is set on config.
 
 if __name__ == "__main__":
     main()

@@ -26,3 +26,7 @@ def json_2_nni_search_space_dict(json_file: str) -> dict:
         dict_[key] = {'_type': json_config[key][0], '_value': json_config[key][1]}
 
     return dict_
+
+def export_config_2_json_file(config:dict, file_name:str, path:os.path):
+    with open(os.path.join(path, f'{file_name}.json'), 'w') as fp:
+        json.dump(config, fp)

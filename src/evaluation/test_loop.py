@@ -1,36 +1,105 @@
 from src.utils.model_handling import load_model, get_model_dataset, update_state_action_buffers, get_model_device, init_state_action_buffers
-import torch, os
+from src.utils.gym_env_handling import save_animation
+from src.utils.json_handling import export_config_2_json_file
+import torch, os, pickle
 import gymnasium as gym
 import numpy as np
+import warnings
 
 def test(test_cfg):
     """
     """
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+    models_path = os.path.join(project_root, 'results', 'models')
+
     rewards = None
 
-    if isinstance(test_cfg.model, str):                 # id of a single model to be tested.
-        rewards = test_single_model(
-            model_id=test_cfg.model,
-            nb_test_episodes=test_cfg.nb_test_episodes,
-            sequence_length=test_cfg.sequence_length,
-            reward_per_episode=test_cfg.reward_per_episode,
-            export_animation=test_cfg.save_animation
-        )
-
-        print(rewards)
-    elif isinstance(test_cfg.model, list):
+    if isinstance(test_cfg.model, str):
         if len(test_cfg.model):
-            # no model ids in the list - test all in `/results/models`.
-            pass
+            # Single model to be tested.
+            rewards = test_model_on_env(
+                model_id=test_cfg.model,
+                nb_test_episodes=test_cfg.nb_test_episodes,
+                sequence_length=test_cfg.sequence_length,
+                reward_per_episode=test_cfg.reward_per_episode,
+                export_animation=test_cfg.save_animation
+            )
+
+            # Export to file.
+            if test_cfg.export_to_file:
+                export_rewards_2_file(model_id=test_cfg.model, rewards=rewards, reward_per_episode=test_cfg.reward_per_episode)
+                export_config_2_json_file(config=test_cfg, file_name=f'test_config-{test_cfg.model}', path=os.path.join(models_path, test_cfg.model))
         else:
-            # list of one or more model ids to be tested.
-            pass
+            # Empty model id - test all models found in `/results/models/`.
+            models_list = os.listdir(models_path)
+
+            if len(models_list):
+                rewards = []
+                for model_id in models_list:
+                    rewards.append(
+                        test_model_on_env(
+                            model_id=model_id,
+                            nb_test_episodes=test_cfg.nb_test_episodes,
+                            sequence_length=test_cfg.sequence_length,
+                            reward_per_episode=test_cfg.reward_per_episode,
+                            export_animation=test_cfg.save_animation
+                        )
+                    )
+                    # Export to file.
+                    if test_cfg.export_to_file:
+                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode)
+                        export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
+            else:
+                warnings.warn(f'No models found in {models_path}.')
+
+    elif isinstance(test_cfg.model, list):
+        # Multiple model IDs in a list to be tested.
+        if len(test_cfg.model):
+            rewards = []
+            
+            for model_id in test_cfg.model:
+                rewards.append(
+                    test_model_on_env(
+                        model_id=model_id,
+                        nb_test_episodes=test_cfg.nb_test_episodes,
+                        sequence_length=test_cfg.sequence_length,
+                        reward_per_episode=test_cfg.reward_per_episode,
+                        export_animation=test_cfg.save_animation
+                    )
+                )
+                # Export to file.
+                if test_cfg.export_to_file:
+                    export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode)
+                    export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
+        else:
+            # Empty list - test all models found in `/results/models/`.
+            models_list = os.listdir(models_path)
+
+            if len(models_list):
+                rewards = []
+                for model_id in models_list:
+                    rewards.append(
+                        test_model_on_env(
+                            model_id=model_id,
+                            nb_test_episodes=test_cfg.nb_test_episodes,
+                            sequence_length=test_cfg.sequence_length,
+                            reward_per_episode=test_cfg.reward_per_episode,
+                            export_animation=test_cfg.save_animation
+                        )
+                    )
+                    # Export to file.
+                    if test_cfg.export_to_file:
+                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode)
+                        export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
+            else:
+                warnings.warn(f'No models found in {models_path}.')
+
     else:
         pass
 
     return rewards
 
-def test_single_model(model_id:str, nb_test_episodes:int, sequence_length:int, reward_per_episode:str, export_animation:bool=False) -> np.array:
+def test_model_on_env(model_id:str, nb_test_episodes:int, sequence_length:int, reward_per_episode:str, export_animation:bool=False) -> dict:
     """
     """
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -43,12 +112,11 @@ def test_single_model(model_id:str, nb_test_episodes:int, sequence_length:int, r
     # Loading training dataset (prevent data leakage)
     # -------------------------------------------
     dataset_name = get_model_dataset(model_id=model_id) # dataset (.pt) file used for training.
-    print(dataset_name)
     dataset = torch.load(os.path.join(project_root, 'data', 'processed', dataset_name), weights_only=False)
     
     # Simulate env
     # -------------------------------------------
-    rewards = []
+    rewards_per_env_seed = {}
     for rand_seed in range(dataset.nb_episodes, dataset.nb_episodes+nb_test_episodes):
         reward_per_step = []
 
@@ -99,18 +167,18 @@ def test_single_model(model_id:str, nb_test_episodes:int, sequence_length:int, r
             done = terminated or truncated
 
         env.close()
-        rewards.append(np.sum(reward_per_step) if reward_per_episode == 'total' else np.array(reward_per_step))
+        rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'total' else np.array(reward_per_step)
 
         if export_animation:
             save_animation(
                 frames=frames, modeL_dir=os.path.join(project_root, 'results', 'models', model_id), file_name=f'env_seed_{rand_seed}.gif'
             )
 
-    return np.array(rewards)
+    return rewards_per_env_seed
 
-def save_animation(frames:list, modeL_dir:os.path, file_name:str) -> None:
-    import imageio
-    
-    gif_path = os.path.join(modeL_dir, 'animations')
-    os.makedirs(gif_path, exist_ok=True)
-    imageio.mimsave(os.path.join(gif_path, file_name), frames, fps=30)
+def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str) -> None:
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+    models_path = os.path.join(project_root, 'results', 'models')
+
+    with open(os.path.join(models_path, f'evaluation-{model_id}-reward_per_episode_{reward_per_episode}.pkl'), 'wb') as file:
+        pickle.dump(rewards, file)

@@ -1,8 +1,10 @@
 {   
+    "seed": 0,
     "model": "5w95p",
     "nb_test_episodes": 5,
     "save_animation": true,
     "env_noise": [false, ""],
     "sequence_length": 12,
-    "reward_per_episode": "total"
+    "reward_per_episode": "total",
+    "export_to_file": true
 }
