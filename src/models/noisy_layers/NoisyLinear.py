@@ -12,18 +12,19 @@ class NoisyLinear(nn.Module):
         self.size_in, self.size_out = size_in, size_out
         self.noise_scale = getattr(config, 'noise_scale', 1.0)
 
+        k = 1 / size_in
+
         # Use a local generator for reproducible weight initialization.
         generator = torch.Generator()
         generator.manual_seed(config.seed)
 
-        # Match nn.Linear initialization exactly.
+        # Default nn.Linear weight initialization.
         self.weights = nn.Parameter(torch.empty(size_out, size_in))
-        nn.init.kaiming_uniform_(self.weights, a=math.sqrt(5), generator=generator)
+        nn.init.uniform_(self.weights, -math.sqrt(k), math.sqrt(k), generator=generator)
 
-        # `nn.Linear` by default initializes bias using the same uniform distribution as weights.
-        bound = 1 / math.sqrt(size_in)
+        # Default nn.Linear bias initialization.
         self.bias = nn.Parameter(torch.empty(size_out))
-        nn.init.uniform_(self.bias, -bound, bound, generator=generator)
+        nn.init.uniform_(self.bias, -math.sqrt(k), math.sqrt(k), generator=generator)
 
         # Noise function.
         if config.noise_type == 'uniform':

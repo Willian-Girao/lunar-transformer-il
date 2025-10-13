@@ -100,7 +100,7 @@ def main():
         "model": model_id,
         'device': device,
         "nb_test_episodes": config_json['nb_test_episodes'],
-        "save_animation": True,
+        "save_animation": False,
         "env_noise": [config_json['env_noise'], ""],
         "sequence_length": params['testing_seq_len'],
         "reward_per_episode": params['reward_per_episode']

@@ -1,5 +1,5 @@
 {   
-    "model": "r089d",
+    "model": "5w95p",
     "nb_test_episodes": 5,
     "save_animation": true,
     "env_noise": [false, ""],
