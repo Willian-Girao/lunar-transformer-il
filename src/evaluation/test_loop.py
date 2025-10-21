@@ -5,6 +5,7 @@ import torch, os, pickle
 import gymnasium as gym
 import numpy as np
 import warnings
+from tqdm import tqdm
 
 def test(test_cfg):
     """
@@ -116,8 +117,11 @@ def test_model_on_env(model_id:str, nb_test_episodes:int, sequence_length:int, r
     
     # Simulate env
     # -------------------------------------------
+    test_iter = range(dataset.nb_episodes, dataset.nb_episodes+nb_test_episodes)
+    progress = tqdm(test_iter, desc=f'Testing model ID {model_id}', unit='env(seed)')
+
     rewards_per_env_seed = {}
-    for rand_seed in range(dataset.nb_episodes, dataset.nb_episodes+nb_test_episodes):
+    for rand_seed in progress:
         reward_per_step = []
 
         env = gym.make("LunarLander-v3", render_mode="rgb_array" if export_animation else None)
@@ -169,16 +173,18 @@ def test_model_on_env(model_id:str, nb_test_episodes:int, sequence_length:int, r
         env.close()
         rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'total' else np.array(reward_per_step)
 
+        progress.set_postfix({'accumulated reward': f'{np.sum(reward_per_step):.3f}'})
+
         if export_animation:
             save_animation(
-                frames=frames, modeL_dir=os.path.join(project_root, 'results', 'models', model_id), file_name=f'env_seed_{rand_seed}.gif'
+                frames=frames, modeL_dir=os.path.join(project_root, 'results', 'models', model_id), file_name=f'env_seed_{rand_seed}_{int(np.sum(reward_per_step))}.gif'
             )
 
     return rewards_per_env_seed
 
 def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str) -> None:
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    models_path = os.path.join(project_root, 'results', 'models')
+    models_path = os.path.join(project_root, 'results', 'models', model_id)
 
     with open(os.path.join(models_path, f'evaluation-{model_id}-reward_per_episode_{reward_per_episode}.pkl'), 'wb') as file:
         pickle.dump(rewards, file)

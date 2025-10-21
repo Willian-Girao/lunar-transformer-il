@@ -55,6 +55,9 @@ def load_checkpoint(model_id:str):
     model_dir = os.path.join(project_root, 'results', 'models', model_id)
     pth_files = sorted(list(Path(model_dir).rglob('*.pth')))
 
+    if not len(pth_files):
+        raise ValueError(f'No .pth files in {model_dir}.')
+    
     if len(pth_files) > 1:
         raise warnings.warn(f'{len(pth_files)} .pth files found in {os.path.join(project_root, model_id)}. The 1st element in the list will be used.')
     
