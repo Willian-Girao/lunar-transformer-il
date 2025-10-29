@@ -5,7 +5,7 @@ def main():
     import torch, nni
     import numpy as np
     import os
-    from src.evaluation.test_loop import test
+    from src.evaluation.test_loop import test_hpo
     import argparse
     from src.utils.json_handling import json_2_dict
     from src.models.decoder_only_transformer.DecoderTransformer import DecoderTransformer
@@ -13,6 +13,7 @@ def main():
     from src.training.training_loop import train_model
     from src.training.TrainingConfig import TrainingConfig
     from src.evaluation.TestingConfig import TestingConfig
+    from src.hpo.custom_fitness_functions import evaluate_lander_performance
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
@@ -32,7 +33,7 @@ def main():
         "embedding_dim": 32,
         "intermediate_dim": 128,
         "training_seq_len": 12,
-        "testing_seq_len": 6,
+        "testing_seq_len": 12,
         "lr": 1e-3,
         "batch_size": 32,
         "hidden_dropout_prob": 0.5 ,
@@ -51,7 +52,7 @@ def main():
 
     # TODO: hacky, have to implement better
     _ = params['training_seq_len']
-    config_json['dataset'] = f"gymnasium-ActorCritic-LunarLander-600-{_}-os.pt"
+    config_json['dataset'] = f"gymnasium-ActorCritic-LunarLander-1000-{_}-os.pt"
 
     dataset = torch.load(os.path.join(project_root, 'data', 'processed', config_json['dataset']), weights_only=False)
     classes_weights = dataset.get_classes_weights().to(device)
@@ -109,11 +110,11 @@ def main():
     test_cfg = TestingConfig()
     test_cfg.from_dict(dict=test_dict)
 
-    rewards = test(test_cfg)
+    fitnesses = test_hpo(test_cfg)
 
     # Report to NNI
     # -------------------------------------------
-    nni.report_final_result(np.sum(rewards))
+    nni.report_final_result(np.mean(fitnesses))
 
 if __name__ == "__main__":
     main()

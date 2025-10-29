@@ -3,14 +3,18 @@ from tqdm import tqdm
 import torch, os
 import random
 import string
+from src.utils.model_handling import get_param_sum
 
-def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader) -> str:
+def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader, show_param_sum=True) -> str:
     model_id = generate_checkpoint_id()
     epochs_losses = []
     epoch_iter = range(train_cfg.epochs)
 
+    param_sum = get_param_sum(model=model)
+    show = f' (param. sum {param_sum:.3f})' if show_param_sum else ''
+
     if train_cfg.progress:
-        epoch_iter = tqdm(epoch_iter, desc=f'Training model ID {model_id}', unit='epoch')
+        epoch_iter = tqdm(epoch_iter, desc=f'Training model ID {model_id} ({model_cfg.depth} {model_cfg.num_attention_heads} {model_cfg.embedding_dim} {model_cfg.intermediate_dim}) seed {model_cfg.seed} {show}', unit='epoch')
 
     model.train()
     for ep in epoch_iter:

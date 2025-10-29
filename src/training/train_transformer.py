@@ -8,6 +8,8 @@ def main():
     import torch.optim as optim
     from torch.utils.data import DataLoader
     from src.utils.dataset_handling import subset_dataset
+    import numpy as np
+    import random
 
     from src.models.decoder_only_transformer.TransformerConfig import TransformerConfig
     from src.models.decoder_only_transformer.DecoderTransformer import DecoderTransformer
@@ -30,6 +32,11 @@ def main():
     # -------------------------------------------
     train_cfg = TrainingConfig()
     train_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.train_json))
+    train_cfg.seed = model_cfg.seed # TODO train_cfg.seed overrides the model's during checkpoint save.
+
+    torch.manual_seed(model_cfg.seed)
+    np.random.seed(model_cfg.seed)
+    random.seed(model_cfg.seed)
 
     # Load dataset
     # -------------------------------------------

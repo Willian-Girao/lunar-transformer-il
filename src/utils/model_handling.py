@@ -1,7 +1,8 @@
-import os, torch
+import os, torch, pickle
 from pathlib import Path
 import warnings
 import numpy as np
+import torch.nn as nn
 from src.models.decoder_only_transformer.DecoderTransformer import DecoderTransformer
 
 def save_model(checkpoint:dict, model_id:str, file_name:str) -> None:
@@ -113,3 +114,38 @@ def init_state_action_buffers(state, dataset_mean, dataset_std, normalize):
         states_buffer[..., :6] = (states_buffer[..., :6]  - dataset_mean) / dataset_std
 
     return states_buffer, actions_buffer
+
+def get_param_sum(model: nn.Module):
+    total_sum = 0.0
+    for param in model.parameters():
+        total_sum += param.data.sum().item()
+    return total_sum
+
+def get_models_training_loss(model_id:str):
+    checkpoint = load_checkpoint(model_id)
+    return checkpoint['epochs_losses']
+
+def get_models_evaluation_data(model_id: str, model_dir: str = None):
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+    model_path = os.path.join(
+        project_root,
+        'results',
+        'models' if model_dir is None else model_dir,
+        model_id
+    )
+    files = os.listdir(model_path)
+    
+    matching_file = None
+    for f in files:
+        if f.startswith(f"evaluation-{model_id}") and f.endswith(".pkl"):
+            matching_file = f
+            break
+
+    if matching_file is None:
+        raise FileNotFoundError(f'No evaluation file found for model_id {model_id} in {model_path}')
+    
+    file_path = os.path.join(model_path, matching_file)
+    with open(file_path, 'rb') as f:
+        eval_data = pickle.load(f)
+    
+    return eval_data

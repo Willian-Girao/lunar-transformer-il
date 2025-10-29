@@ -7,7 +7,6 @@ class TestingConfig(dict):
     key-based access.
     """
     defaults = {
-        'seed': 0,
         'model': [], 
         'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     }

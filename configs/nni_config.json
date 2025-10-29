@@ -9,5 +9,5 @@
     "dataset": "",
     "nb_test_episodes": 10,
     "env_noise": false,
-    "reward_per_episode": "total"
+    "reward_per_episode": "all"
 }
