@@ -52,7 +52,7 @@ def main():
         # Each arch. config. is tried with multiple seeds
         # -------------------------------------------
         for seed in range(arch_cfg['nb_seeds']):
-            if seed <= 6:
+            if seed <= 7 and model_cfg.depth == 4:
                 pass
             else:
 

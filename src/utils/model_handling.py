@@ -142,7 +142,7 @@ def get_models_evaluation_data(model_id: str, model_dir: str = None):
             break
 
     if matching_file is None:
-        raise FileNotFoundError(f'No evaluation file found for model_id {model_id} in {model_path}')
+        return None
     
     file_path = os.path.join(model_path, matching_file)
     with open(file_path, 'rb') as f:
