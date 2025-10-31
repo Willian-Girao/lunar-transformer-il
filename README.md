@@ -38,3 +38,15 @@ The project pipeline consists of four main stages:
 <p align="center">
   <img src="data/media/pipeline.svg" alt="Pipeline Diagram" width="250">
 </p>
+
+## Repository Structure
+
+```
++---Folder A
+|   |   File 1
+|   |   File 2
+|   \---Folder B
+|           File 3
+\---Folder C
+        File 4
+```
