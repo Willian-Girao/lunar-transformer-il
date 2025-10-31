@@ -18,6 +18,7 @@ Here, I investigate whether a Transformer trained purely from **expert demonstra
 The project pipeline consists of four main stages:
 
 <div style="display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;">
+<!-- LEFT COLUMN -->
 <div style="flex: 1; min-width: 300px;">
 
 ### 1. Expert Acquisition :brain:
@@ -40,6 +41,7 @@ The project pipeline consists of four main stages:
   - **Altered-gravity** variants (±10%).
 
 </div>
+<!-- RIGHT COLUMN -->
 <div style="flex: 1; min-width: 300px; display: flex; justify-content: center;">
     <img src="data/media/pipeline.svg" alt="Pipeline Diagram" style="height: 100%; object-fit: contain;">
 </div>
