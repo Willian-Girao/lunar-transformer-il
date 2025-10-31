@@ -6,9 +6,6 @@ The trained Transformer is able to **land the spacecraft successfully**, and eve
 
 ![Landing Demo](results/media/lander_success.gif)
 
-<div style="display: flex; align-items: stretch; gap: 24px;">
-<div style="flex: 1;">
-
 ## Motivation
 
 Reinforcement learning agents are often **sample-inefficient** and **sensitive to environment changes**.  
@@ -19,6 +16,9 @@ Here, I investigate whether a Transformer trained purely from **expert demonstra
 ## Approach Overview
 
 The project pipeline consists of four main stages:
+
+<div style="display: flex; align-items: stretch; gap: 24px;">
+<div style="flex: 1;">
 
 ### 1. Expert Acquisition :brain:
 - A pretrained (on the standard Lunar Lander environment) [actor–critic agent](https://github.com/nikhilbarhate99/Actor-Critic-PyTorch) is used.
