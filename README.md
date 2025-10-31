@@ -45,7 +45,7 @@ The project pipeline consists of four main stages:
 
   <!-- Right column -->
   <div style="flex: 0 0 250px; display: flex; justify-content: center; align-items: flex-start;">
-    <img src="data/media/pipeline.svg" alt="Pipeline Diagram" style="width: 100%; object-fit: contain;">
+    <img style="display: block; margin: auto;" src="data/media/pipeline.svg"/>
   </div>
 
 </div>
