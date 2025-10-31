@@ -1,5 +1,4 @@
 {   
-    "seed": 1,
     "model": "",
     "nb_test_episodes": 5,
     "save_animation": true,
