@@ -22,7 +22,7 @@ The project pipeline consists of four main stages:
 
 ### 2. Data Generation :rocket:
 - The expert policy produces 1000 trajectories of `(state, action)` tuples plus the accumulated reward per episode.
-- These rollouts are padded to get fixed-length episodes, stored and later tokenized into sequences for the Transformer.
+- These episodes are padded to get fixed-length episodes, stored and later tokenized into sequences for the Transformer.
 - The normalized accumulated rewards are used to weight the losses during training.
 
 ### 3. Transformer Training :robot:
@@ -41,12 +41,36 @@ The project pipeline consists of four main stages:
 
 ## Repository Structure
 
+The repository is organized as follows:
+
 ```
-+---Folder A
-|   |   File 1
-|   |   File 2
-|   \---Folder B
-|           File 3
-\---Folder C
-        File 4
+lunar-transformer-il/
+├── configs/               # JSON experiment configs
+├── data/
+│   ├── raw/               # Expert episodes
+│   └── processed/         # Tokenized sequences
+│   └── media/             # Images/GIFs and other used for documentation
+├── notebooks/             # Analysis & visualization
+├── results/
+│   ├── models/            # Saved checkpoints (.pth) and evaluation data (.pkl)
+│   └── plots/             # Generated figures
+├── scripts/               # Bash / CLI entrypoints
+└── src/
+    ├── data/              # Handles expert data and transformer dataset generation
+    ├── evaluation/        # Evaluation & generalization tests
+    ├── hpo/               # Coarse architecture search and NNI HPO
+    ├── models/            # Transformer & Actor-Critic architectures
+    ├── training/          # Training loops & trainer utilities
+    └── utils/             # Logging, plotting, config parsers
+
 ```
+
+## Contact
+
+I’m always open to discuss deep-learning research or ML engineering opportunities!
+
+:email: [wsoaresgirao@gmail.com](mailto:wsoaresgirao@gmail.com)
+
+:link: [LinkedIn](https://www.linkedin.com/in/williansg/?originalSubdomain=nl)
+
+:computer: [GitHub](https://github.com/Willian-Girao)
