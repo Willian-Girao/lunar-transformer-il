@@ -17,9 +17,10 @@ Here, I investigate whether a Transformer trained purely from **expert demonstra
 
 The project pipeline consists of four main stages:
 
-<table style="border: none; border-collapse: collapse; width: 100%;">
-<tr>
-<td style="border: none; vertical-align: top; padding-right: 24px;">
+<div style="display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;">
+
+  <!-- Left column: text -->
+  <div style="flex: 1; min-width: 300px;">
 
 ### 1. Expert Acquisition :brain:
 - A pretrained (on the standard Lunar Lander environment) [actor–critic agent](https://github.com/nikhilbarhate99/Actor-Critic-PyTorch) is used.
@@ -40,11 +41,11 @@ The project pipeline consists of four main stages:
   - The **original environment**, and  
   - **Altered-gravity** variants (±10%).
 
-</td>
-<td style="border: none; vertical-align: top;">
+  </div>
 
-<img src="data/media/pipeline.svg" alt="Pipeline Diagram" width="250">
+  <!-- Right column: image -->
+  <div style="flex: 1; min-width: 300px; display: flex; justify-content: center;">
+    <img src="data/media/pipeline.svg" alt="Pipeline Diagram" style="height: 600px; object-fit: contain;">
+  </div>
 
-</td>
-</tr>
-</table>
+</div>
