@@ -39,6 +39,30 @@ The project pipeline consists of four main stages:
   <img src="data/media/pipeline.svg" alt="Pipeline Diagram" width="250">
 </p>
 
+## Results
+
+### Key Insight: Train-Long, Test-Short Improves Robustness
+
+Although the best model was **trained with sequence length = 12**, it achieved **higher returns during deployment** when the inference context was **shortened to 6**.
+
+> **Hypothesis:**  
+> Shorter inference contexts act as a *regularizer*, limiting the propagation of compounding errors and reducing the influence of outdated states — mitigating distribution-shift noise common in imitation learning.
+
+This effect parallels known findings in sequence modeling (e.g., *Press et al., 2022; Chen et al., 2021*) but has rarely been examined in control tasks.
+
+## Reproducing the Experiments
+
+```bash
+# 1. Generate expert trajectories
+bash scripts/generate_expert_data.sh
+
+# 2. Train the Transformer
+bash scripts/train_transformer.sh
+
+# 3. Evaluate generalization
+bash scripts/evaluate_generalization.sh
+```
+
 ## Repository Structure
 
 The repository is organized as follows:
