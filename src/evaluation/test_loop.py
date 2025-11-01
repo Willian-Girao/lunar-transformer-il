@@ -6,6 +6,7 @@ import gymnasium as gym
 import numpy as np
 import warnings
 from tqdm import tqdm
+import shutil
 
 def test(test_cfg):
     """
@@ -100,7 +101,7 @@ def test(test_cfg):
 
     return rewards
 
-def test_model_on_multiple_envs(model_id:str, nb_test_episodes:int, sequence_length:int, reward_per_episode:str, export_animation:bool=False) -> dict:
+def test_model_on_multiple_envs(model_id:str, nb_test_episodes:int, sequence_length:int, reward_per_episode:str, export_animation:bool=False, overrride_existing:bool=True) -> dict:
     """
     """
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -114,24 +115,31 @@ def test_model_on_multiple_envs(model_id:str, nb_test_episodes:int, sequence_len
     # -------------------------------------------
     dataset_name = get_model_dataset(model_id=model_id) # dataset (.pt) file used for training.
     dataset = torch.load(os.path.join(project_root, 'data', 'processed', dataset_name), weights_only=False)
-    
+
+    # Override existing animations
+    # -------------------------------------------
+    gif_path = os.path.join(project_root, 'results', 'models', model_id, 'animations')
+
+    if overrride_existing and os.path.exists(gif_path) and os.path.isdir(gif_path):
+        shutil.rmtree(gif_path)
+
     # Simulate env
     # -------------------------------------------
     test_iter = range(dataset.nb_episodes, dataset.nb_episodes+nb_test_episodes)
     progress = tqdm(test_iter, desc=f'Testing model ID {model_id}', unit='env(seed)')
-
+    
     rewards_per_env_seed = {}
     for rand_seed in progress:
 
         # play env
         frames, reward_per_step, _, _, _ = play_env(device, rand_seed, model, dataset, "rgb_array" if export_animation else None, sequence_length)
-        rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'total' else np.array(reward_per_step)
+        rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'accumulated' else np.array(reward_per_step)
 
         progress.set_postfix({'accumulated reward': f'{np.sum(reward_per_step):.3f}'})
 
         if export_animation:
             save_animation(
-                frames=frames, modeL_dir=os.path.join(project_root, 'results', 'models', model_id), file_name=f'env_seed_{rand_seed}_{int(np.sum(reward_per_step))}.gif'
+                frames=frames, path=gif_path, file_name=f'env_seed_{rand_seed}_{int(np.sum(reward_per_step))}.gif'
             )
 
     return rewards_per_env_seed

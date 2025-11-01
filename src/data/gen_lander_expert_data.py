@@ -12,6 +12,8 @@ def main():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('--max_steps', type=int, help='Maximum number of steps an episode can last.', default=400)
     parser.add_argument('--nb_episodes', type=int, help='Number of episodes.', default=1000)
+    parser.add_argument('--start_env_seed', type=int, help='', default=0)
+    parser.add_argument("--is_eval", action="store_true", help='...')
     args = parser.parse_args()
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -37,7 +39,7 @@ def main():
 
     # Multiple envs with different initial states
     # -------------------------------------------
-    seed = 0
+    seed = args.start_env_seed
     while len(lunarlander_training_data['X']) < nb_episodes:
         steps = 0
         env = gym.make("LunarLander-v3", render_mode=None)
@@ -93,7 +95,7 @@ def main():
     lunarlander_training_data['Y'] = np.array(lunarlander_training_data['Y'])
     lunarlander_training_data['rewards'] = np.array(lunarlander_training_data['rewards'])
 
-    with open(os.path.join(export_path, f'gymnasium-ActorCritic-LunarLander-{nb_episodes}.pkl'), 'wb') as file:
+    with open(os.path.join(export_path, f'{'evaluation-' if args.is_eval else ''}gymnasium-ActorCritic-LunarLander-{nb_episodes}.pkl'), 'wb') as file:
         pickle.dump(lunarlander_training_data, file)
 
 if __name__ == "__main__":

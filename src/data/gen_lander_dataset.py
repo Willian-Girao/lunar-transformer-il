@@ -17,7 +17,7 @@ def main():
     # Load the raw data
     # -------------------------------------------
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    dataset_name = 'gymnasium-ActorCritic-LunarLander-1000.pkl'
+    dataset_name = 'evaluation-gymnasium-ActorCritic-LunarLander-100.pkl'
     path = os.path.join(project_root, 'data', 'raw', dataset_name)
 
     with open(path, 'rb') as file:

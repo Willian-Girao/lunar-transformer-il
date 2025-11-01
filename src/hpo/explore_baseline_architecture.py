@@ -52,10 +52,7 @@ def main():
         # Each arch. config. is tried with multiple seeds
         # -------------------------------------------
         for seed in range(arch_cfg['nb_seeds']):
-            if seed <= 7 and model_cfg.depth == 4:
-                pass
-            else:
-
+            if (model_cfg.depth == 4 and seed == 7) or (model_cfg.depth == 6 and seed == 9):
                 torch.manual_seed(seed)
                 np.random.seed(seed)
                 random.seed(seed)
@@ -96,6 +93,8 @@ def main():
                     criterion=criterion,
                     train_dataloader=train_dataloader,
                 )
+            else:
+                pass
 
 if __name__ == "__main__":
     main()

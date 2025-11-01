@@ -42,18 +42,22 @@ def main():
     # -------------------------------------------
     # We load a custom Dataset subclass. Requires pickle, so weights_only=False is necessary.
     # The file is locally generated and trusted.
-    dataset = torch.load(os.path.join(project_root, 'data', 'processed', train_cfg.dataset), weights_only=False)
-    classes_weights = dataset.get_classes_weights().to(train_cfg.device)
+    train_dataset = torch.load(os.path.join(project_root, 'data', 'processed', train_cfg.dataset), weights_only=False)
+    classes_weights = train_dataset.get_classes_weights().to(train_cfg.device)
 
-    if dataset.seq_len != model_cfg.training_seq_len:
-        raise ValueError(f'Dataset sequence length ({dataset.seq_len}) differs from the sequence length set for the transformer ({model_cfg.training_seq_len}).')
+    if train_dataset.seq_len != model_cfg.training_seq_len:
+        raise ValueError(f'Dataset sequence length ({train_dataset.seq_len}) differs from the sequence length set for the transformer ({model_cfg.training_seq_len}).')
     
     if train_cfg.subset_dataset[0]:
         # train_cfg.subset_dataset is a list: 1st index (bool), should subset or not; 2nd index (int), desired number of samples
-        dataset = subset_dataset(dataset=dataset, nb_samples=train_cfg.subset_dataset[1], seed=model_cfg.seed)
+        train_dataset = subset_dataset(dataset=train_dataset, nb_samples=train_cfg.subset_dataset[1], seed=model_cfg.seed)
 
     torch.manual_seed(model_cfg.seed)
-    train_dataloader = DataLoader(dataset=dataset, batch_size=train_cfg.batch_size, shuffle=train_cfg.data_shuffle)
+    train_dataloader = DataLoader(dataset=train_dataset, batch_size=train_cfg.batch_size, shuffle=train_cfg.data_shuffle)
+
+    if train_cfg.epoch_eval:
+        eval_dataset = torch.load(os.path.join(project_root, 'data', 'processed', train_cfg.eval_dataset), weights_only=False)
+        eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=train_cfg.batch_size)
 
     # Instantiate model
     # -------------------------------------------
@@ -73,6 +77,8 @@ def main():
         optimizer=optimizer,
         criterion=criterion,
         train_dataloader=train_dataloader,
+        epoch_eval=train_cfg.epoch_eval,
+        eval_dataloader=eval_dataloader if train_cfg.epoch_eval else None
     )
 
 if __name__ == "__main__":

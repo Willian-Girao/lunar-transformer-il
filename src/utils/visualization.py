@@ -6,10 +6,14 @@ import matplotlib.pyplot as plt
 from IPython.display import display, HTML
 import numpy as np
 
-def show_gifs_in_row(model_id: str, width: int = 500, output_widget=None):
-    print('.....')
+def show_gifs_in_row(model_id: str, width: int = 500, output_widget=None, models_dir_name:str=None):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    results_root = os.path.join(project_root, 'results', 'models')
+
+    if models_dir_name is not None:
+        results_root = os.path.join(project_root, 'results', models_dir_name)
+    else:
+        results_root = os.path.join(project_root, 'results', 'models')
+
     path = os.path.join(results_root, model_id, 'animations')
 
     gifs = [f for f in os.listdir(path) if f.lower().endswith('.gif')]
@@ -17,7 +21,7 @@ def show_gifs_in_row(model_id: str, width: int = 500, output_widget=None):
         print("No .gif files found in the provided path.")
         return
 
-    model_check = load_checkpoint(model_id=model_id)
+    model_check = load_checkpoint(model_id=model_id, model_dir_name=models_dir_name)
     unique_tag = str(time.time())
     html = "".join(
         f"<div style='display:inline-block; text-align:center; margin:5px;'>"
@@ -34,13 +38,16 @@ def show_gifs_in_row(model_id: str, width: int = 500, output_widget=None):
             display(HTML(html))
     else:
         display(HTML(html))
-    # display_training_loss(model_id=model_id)
 
-
-def create_gif_dropdown():
+def create_gif_dropdown(models_dir_name:str=None):
     output = widgets.Output()
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    results_root = os.path.join(project_root, 'results', 'models')
+
+    if models_dir_name is not None:
+        results_root = os.path.join(project_root, 'results', models_dir_name)
+    else:
+        results_root = os.path.join(project_root, 'results', 'models')
+
     names = sorted(os.listdir(results_root))
 
     dropdown = widgets.Dropdown(
@@ -57,7 +64,7 @@ def create_gif_dropdown():
             selected_name = change['new']
             if selected_name == "Select a model...":
                 return
-            show_gifs_in_row(model_id=selected_name, output_widget=output)
+            show_gifs_in_row(model_id=selected_name, output_widget=output, models_dir_name=models_dir_name)
 
         dropdown.observe(on_select, names='value')
         dropdown._custom_callback_attached = True  # mark as attached
@@ -80,9 +87,14 @@ def display_training_loss(model_id: str, ylim=(0, 0.1)):
     plt.show()
     plt.close()
 
-def get_all_rewards():
+def get_all_rewards(models_dir_name:str=None):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    results_root = os.path.join(project_root, 'results', 'models')
+
+    if models_dir_name is not None:
+        results_root = os.path.join(project_root, 'results', models_dir_name)
+    else:
+        results_root = os.path.join(project_root, 'results', 'models')
+
     models = sorted(os.listdir(results_root))
 
     env_seeds = []

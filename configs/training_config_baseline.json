@@ -3,7 +3,9 @@
     "learning_rate": 5e-4,
     "batch_size": 64,
     "data_shuffle": true,
-    "epochs": 25,
+    "epochs": 5,
     "progress": true,
-    "subset_dataset": [false, 0]
+    "subset_dataset": [false, 0],
+    "epoch_eval": true,
+    "eval_dataset": "evaluation-gymnasium-ActorCritic-LunarLander-100-16-os.pt"
 }

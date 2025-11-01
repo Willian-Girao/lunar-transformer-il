@@ -5,7 +5,7 @@ import random
 import string
 from src.utils.model_handling import get_param_sum
 
-def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader, show_param_sum=True) -> str:
+def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader, show_param_sum=True, epoch_eval:bool=False, eval_dataloader=None) -> str:
     model_id = generate_checkpoint_id()
     epochs_losses = []
     epoch_iter = range(train_cfg.epochs)
@@ -38,14 +38,47 @@ def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloa
 
         epochs_losses.append(np.mean(epoch_loss))
 
-        if train_cfg.progress:
-            epoch_iter.set_postfix({'loss': f'{epochs_losses[-1]:.10f}'})
+        if epoch_eval:
+            eval_losses, correct_rate = eval_model(model, eval_dataloader, criterion, train_cfg)
+            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses, eval_losses, correct_rate)
 
-        create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses)
+            if train_cfg.progress:
+                epoch_iter.set_postfix({'loss': f'{epochs_losses[-1]:.10f}', 'CR': f'{correct_rate:.2f}'})
+        else:
+            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses)
+
+            if train_cfg.progress:
+                epoch_iter.set_postfix({'loss': f'{epochs_losses[-1]:.10f}'})
 
     return model_id
 
-def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses):
+def eval_model(model, eval_dataloader, criterion, train_cfg):
+    size = len(eval_dataloader.dataset)
+    num_batches = len(eval_dataloader)
+
+    eval_losses, correct_rate = 0, 0
+
+    model.eval()
+    with torch.no_grad():
+        for ith_batch, (states_batch, actions_batch, labels_batch, masks_batch, _) in enumerate(eval_dataloader):
+            states_batch = states_batch.to(train_cfg.device)
+            actions_batch = actions_batch.to(train_cfg.device)
+            labels_batch = labels_batch.to(train_cfg.device)
+            masks_batch = masks_batch.to(train_cfg.device)
+
+            logits = model(states_seq=states_batch, actions_seq=actions_batch, padding_mask=masks_batch, noise_seed=ith_batch)
+
+            eval_losses += criterion(logits, labels_batch).mean().item()
+
+            predictions = torch.argmax(logits, dim=-1)
+            correct_rate += (predictions == labels_batch).type(torch.float).sum().item()
+
+    eval_losses /= num_batches
+    correct_rate /= size
+
+    return eval_losses, float(correct_rate)
+
+def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses, eval_losses=None, correct_rate=None):
     """
     Saves a model checkpoint containing:
     - model weights
@@ -71,8 +104,14 @@ def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, ep
         **training_cfg_dict,
         'optimizer_state_dict': optimizer.state_dict(),
         'model_state_dict': model.state_dict(),
-        'epochs_losses': np.array(epochs_losses)
+        'epochs_losses': np.array(epochs_losses),
     }
+
+    if eval_losses is not None and correct_rate is not None:
+        checkpoint.update({
+            'eval_losses': eval_losses,
+            'correct_rate': correct_rate
+        })
 
     # Save checkpoint
     save_model(

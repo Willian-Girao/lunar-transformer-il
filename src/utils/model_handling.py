@@ -45,15 +45,35 @@ def get_model_cfg_from_checkpoint(checkpoint):
         if key in checkpoint:
             model_cfg[key] = checkpoint[key]
         else:
-            raise ValueError(f'Key `{key}` could not be found within the models checkpoint `.pth` file.')
+            raise ValueError(f'Key `{key}` could not be found within the model`s configuration object.')
     
     return model_cfg
 
-def load_checkpoint(model_id:str):
+def get_training_cfg_from_checkpoint(checkpoint):
+    """
+    """
+    from src.training.TrainingConfig import TrainingConfig
+
+    training_cfg = TrainingConfig()
+
+    for key in training_cfg.keys():
+        if key in checkpoint:
+            training_cfg[key] = checkpoint[key]
+        else:
+            raise ValueError(f'Key `{key}` could not be found within the model`s training configuration object.')
+    
+    return training_cfg
+
+def load_checkpoint(model_id:str, model_dir_name:str=None):
     """
     """
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    model_dir = os.path.join(project_root, 'results', 'models', model_id)
+
+    if model_dir_name is not None:
+        model_dir = os.path.join(project_root, 'results', model_dir_name, model_id)
+    else:
+        model_dir = os.path.join(project_root, 'results', 'models', model_id)
+
     pth_files = sorted(list(Path(model_dir).rglob('*.pth')))
 
     if not len(pth_files):
@@ -125,7 +145,7 @@ def get_models_training_loss(model_id:str):
     checkpoint = load_checkpoint(model_id)
     return checkpoint['epochs_losses']
 
-def get_models_evaluation_data(model_id: str, model_dir: str = None):
+def get_models_evaluation_data(model_id:str, model_dir:str=None):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
     model_path = os.path.join(
         project_root,
