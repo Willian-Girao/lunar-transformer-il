@@ -37,7 +37,9 @@ The project pipeline consists of four main stages:
 ### 3. Transformer Training :robot:
 - A **decoder-only Transformer** learns to predict the next action given the previous states and actions.
 - Coarse search determines reasonable architectural bounds (e.g., depth, heads, embedding dimension).
-- **Hyperparameter optimization (HPO)** is then performed using [NNI](https://nni.readthedocs.io/).
+- **Hyperparameter optimization (HPO)**:
+  - A coarse grained HPO is done to select the baseline [network architecture](./architecture_search.md).
+  - A finer grained HPO is then performed using [NNI](https://nni.readthedocs.io/).
 
 ### 4. Evaluation & Generalization :video_game:
 - The trained model is compared with the expert in:
