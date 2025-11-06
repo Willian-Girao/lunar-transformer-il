@@ -64,6 +64,8 @@ def main():
     
     seq_type = 'os' if args.overlapping_seqs else 'ds'
 
+    os.makedirs(os.path.join(project_root, 'data', 'processed'), exist_ok=True)
+    
     file_name = dataset_name.replace('.pkl', f'-{args.training_seq_len}-{seq_type}.pt')
     path = os.path.join(project_root, 'data', 'processed', file_name)
     torch.save(dataset, path)
