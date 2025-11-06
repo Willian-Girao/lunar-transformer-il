@@ -1,0 +1,26 @@
+
+================================================================================
+MODEL LOG - 49wa4
+Timestamp: 2025-11-06 12:22:17
+================================================================================
+nb_actions: 4
+state_space_dim: 8
+training_seq_len: 16
+embedding_dim: 64
+token_types: 2
+num_attention_heads: 4
+intermediate_dim: 128
+hidden_dropout_prob: 0.1
+depth: 4
+seed: 4
+noise_type: none
+device: cuda
+dataset: gymnasium-ActorCritic-LunarLander-1000-16-os.pt
+learning_rate: 0.0005
+batch_size: 64
+epochs: 50
+1008: -43
+1003: -51
+1002: -59
+model location: models_architecture_B
+
