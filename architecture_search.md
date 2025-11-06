@@ -6,8 +6,6 @@ Too complex models (e.g., large hidden layers or high embedding dimensions) can 
 
 This stage can be considered an **architecture sanity check** — the goal is to verify that the Transformer can learn meaningful control behavior **before** running a more expensive fine-grained hyperparameter optimization (HPO) with NNI.
 
----
-
 ## Methodology
 
 To determine a suitable model configuration, I tested **increasingly complex network architectures** while varying a small set of key **training hyperparameters**. This provides empirical guidance on the ranges to explore during the final NNI-based HPO.
@@ -28,8 +26,6 @@ To determine a suitable model configuration, I tested **increasingly complex net
 | Dropout Probability | [0.1, 0.2, 0.4] |
 | Training Sequence Length | [12, 16, 20] |
 | Epochs | [25, 50] |
-
----
 
 ## Architecture A
 
@@ -70,8 +66,6 @@ To determine a suitable model configuration, I tested **increasingly complex net
 
 > **Summary:** Architecture A achieves **positive rewards** across several models (w41z1, n3w39, 694ih, and 04z7z), some **across several environment seeds**, indicating sufficient representational capacity to capture the task dynamics. Among these, the **top three models share** key hyperparameters: **learning rate = 1e-4**, **dropout = 0.2**, and **sequence length = 16**. Learning rates one order of magnitude higher or lower result in unstable or slow convergence. **Sequence lengths** shorter than 16 or longer than 20 are sub-optimal, suggesting that moderate temporal context benefits learning. **Training beyond 25 epochs** consistently leads to overfitting and degraded generalization. The **best-performing model (04z7z)** uses the configuration **_learning rate = 1e-4, dropout probability = 0.2, sequence lenght = 16, and epochs = 25_** and represents a strong balance between learning speed and stability.
 
----
-
 ## Architecture B
 
 ### Performance Overview
@@ -110,8 +104,6 @@ To determine a suitable model configuration, I tested **increasingly complex net
 <p align="center"><i>Figure 20: Effect of sequence length on performance and reward variance.</i></p>
 
 > **Summary:** Architecture B achieves **positive rewards in only two models**, each producing a **single successful run**. While it consistently reaches **lower evaluation loss** and higher **correct rates** than Architecture A, this improvement **does not translate into better task performance**. The model likely **overfits the expert trajectory distribution**, that is, it imitates the expert’s actions more precisely on familiar states but struggles to recover when encountering unseen states during deployment. As in Architecture A, the most stable results occur with **learning rate = 1e-4** and **dropout = 0.2**, while **sequence lengths** around 16 promote better generalization. Similarly to what was observed with Architecture A, learning rates an order of magnitude above or below 1e-4 lead to unstable or slow convergence.
-
----
 
 ## Architecture C
 
@@ -152,13 +144,11 @@ To determine a suitable model configuration, I tested **increasingly complex net
 
 > **Summary:** Architecture C **fails to achieve any positive-reward episodes**, likely for reasons similar to those observed in Architecture B, that is, **overfitting to the expert trajectory distribution** and limited robustness when acting autonomously. Despite its increased capacity, the model shows **no improvement in control performance**, suggesting that **_further depth and width primarily reinforce memorization_** rather than generalization. Consistent with previous results, the top three models share **learning rate = 1e-4**, **dropout = 0.2**, and **sequence length = 16**, with the best-performing configuration trained for **25 epochs**.
 
----
-
 ## Observations
 
 ### Recurring Values
 
-The recurring values for **learning rate**, **dropout probability**, **trining sequence length**, and **training epochs** across architectures provide a solid basis for defining the center points of the hyperparameter search space for the subsequent, fine-grained HPO using NNI.
+The recurring values for **learning rate (1e-4)**, **dropout probability (0.2)**, **trining sequence length (16)**, and **training epochs (25)** across architectures provide a solid basis for defining the center points of the hyperparameter search space for the subsequent, fine-grained HPO using NNI.
 
 | Architecture | Learning Rate | Dropout | Seq. Length | Epochs |
 |---------------|---------------|----------|--------------|---------|
@@ -166,7 +156,7 @@ The recurring values for **learning rate**, **dropout probability**, **trining s
 | **A** | 1e-4 | 0.2 | 16 | 50 |
 | **A** | 1e-4 | 0.2 | 20 | 50 |
 
-<p align="center"><i>Table 1: Summary of the top-3 performing model configurations during coarse search, ordered by mean accumulated reward.</i></p>
+<p align="center"><i>Table 1: Summary of the top-3 performing model configurations (across architectures) during coarse search, ordered by mean accumulated reward.</i></p>
 
 ### Evaluation vs. Deployment Generalization
 
