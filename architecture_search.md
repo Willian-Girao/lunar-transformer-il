@@ -170,11 +170,7 @@ A model that is **_too specialized_** to the training distribution (as are the c
 
 Some of the models are able to **achieve low negative rewards by luck**. An example of that can be seen when the lander crashes, whithout having taken any action, close enough to the landing site. Because of that, the more **_fine-grained HPO should consider a metric that is different than the total reward_** of an episode. A candidate could be the **area under the reward curve** during the episode, wich would be more telling of the actual capacity to control the lander.
 
----
-
 ## Next Steps
 
 The insights gained here informed the **search space design** for the subsequent NNI-based fine-tuning. Architecture **A** is chosen as the baseline configuration for this next phase since it is the one that maximizes positive rewards.
-
----
 
