@@ -10,7 +10,7 @@ The trained Transformer is able to **land the spacecraft successfully**, and eve
 </figure>
 
 <figure style="display: inline-block; text-align: center;">
-  <p align="center"><img src="data/media/transformer_pilot.gif" alt="Transformer Pilot" width="75%"></p>
+  <p align="center"><img src="data/media/transformer_pilot_2.gif" alt="Transformer Pilot" width="75%"></p>
   <p align="center"><i>Figure 2: Transformer piloting the lander.</i></p>
 </figure>
 
