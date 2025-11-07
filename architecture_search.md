@@ -12,6 +12,8 @@ To determine a suitable model configuration, I tested **increasingly complex net
 
 ### Architecture Hyperparameters (increasing complexity)
 
+<p align="center">
+
 | Architecture | Depth | Attention Heads | Embedding Dim | Intermediate Dim |
 |--------------|--------|------------------|----------------|------------------|
 | **0** | 1 | 1 | 16 | 32 |
@@ -19,7 +21,11 @@ To determine a suitable model configuration, I tested **increasingly complex net
 | **B** | 4 | 4 | 64 | 128 |
 | **C** | 6 | 8 | 128 | 256 |
 
+</p>
+
 ### Training Hyperparameters
+
+<p align="center">
 
 | Hyperparameter | Values Tested |
 |----------------|----------------|
@@ -27,6 +33,8 @@ To determine a suitable model configuration, I tested **increasingly complex net
 | Dropout Probability | [0.1, 0.2, 0.4] |
 | Training Sequence Length | [12, 16, 20] |
 | Epochs | [25, 50] |
+
+</p>
 
 ## TL;DR
 
@@ -164,6 +172,8 @@ In what follows we skip the plots for Architecture 0 for the sake of simplicity.
 
 The recurring values for **learning rate (1e-4)**, **dropout probability (0.2)**, **trining sequence length (16)**, and **training epochs (25)** across architectures provide a solid basis for defining the center points of the hyperparameter search space for the subsequent, fine-grained HPO using NNI.
 
+<p align="center">
+
 | Architecture | Learning Rate | Dropout | Seq. Length | Epochs |
 |---------------|---------------|----------|--------------|---------|
 | **A** | 1e-4 | 0.2 | 16 | 25 |
@@ -171,6 +181,7 @@ The recurring values for **learning rate (1e-4)**, **dropout probability (0.2)**
 | **A** | 1e-4 | 0.2 | 20 | 50 |
 
 <p align="center"><i>Table 1: Summary of the top-3 performing model configurations (across architectures) during coarse search, ordered by mean accumulated reward.</i></p>
+</p>
 
 ### Evaluation vs. Deployment Generalization
 

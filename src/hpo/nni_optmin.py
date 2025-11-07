@@ -31,13 +31,12 @@ def main():
         "depth": 2,
         "num_attention_heads": 2,
         "embedding_dim": 32,
-        "intermediate_dim": 128,
-        "training_seq_len": 12,
-        "testing_seq_len": 12,
-        "lr": 1e-3,
-        "batch_size": 32,
-        "hidden_dropout_prob": 0.5 ,
-        "epochs": 50
+        "intermediate_dim": 64,
+        "training_seq_len": 16,
+        "lr": 5e-4,
+        "batch_size": 64,
+        "hidden_dropout_prob": 0.2,
+        "epochs": 25
     }
 
     # Get optimized hyperparameters
@@ -103,7 +102,7 @@ def main():
         "nb_test_episodes": config_json['nb_test_episodes'],
         "save_animation": False,
         "env_noise": [config_json['env_noise'], ""],
-        "sequence_length": params['testing_seq_len'],
+        "sequence_length": params['training_seq_len'],
         "reward_per_episode": params['reward_per_episode']
     }
     
