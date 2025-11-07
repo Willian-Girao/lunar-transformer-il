@@ -5,12 +5,12 @@ This project explores how a **decoder-only Transformer** can learn to control th
 The trained Transformer is able to **land the spacecraft successfully**, and even **generalizes** when the environment physics (e.g., gravity) are modified!
 
 <figure style="display: inline-block; text-align: center;">
-  <img src="data/media/expert_pilot.gif" alt="Expert Pilot" width="75%">
+  <p align="center"><img src="data/media/expert_pilot.gif" alt="Expert Pilot" width="75%"></p>
   <p align="center"><i>Figure 1: Expert piloting the lander.</i></p>
 </figure>
 
 <figure style="display: inline-block; text-align: center;">
-  <img src="data/media/transformer_pilot.gif" alt="Transformer Pilot" width="75%">
+  <p align="center"><img src="data/media/transformer_pilot.gif" alt="Transformer Pilot" width="75%"></p>
   <p align="center"><i>Figure 2: Transformer piloting the lander.</i></p>
 </figure>
 
