@@ -4,7 +4,7 @@ A **coarse search** of **network architecture** hyperparameters (e.g., model dep
 
 Too complex models (e.g., large hidden layers or high embedding dimensions) can overfit the training data, leading to poor generalization. Conversely, overly simple architectures may fail to capture the underlying task dynamics.
 
-This stage can be considered an **architecture sanity check** — the goal is to verify that the Transformer can learn meaningful control behavior **before** running a more expensive fine-grained hyperparameter optimization (HPO) with NNI.
+This stage can be considered an **architecture sanity check**: the goal is to verify that the Transformer can learn meaningful control behavior **before** running a more expensive fine-grained hyperparameter optimization (HPO) with NNI.
 
 ## Methodology
 
@@ -14,6 +14,7 @@ To determine a suitable model configuration, I tested **increasingly complex net
 
 | Architecture | Depth | Attention Heads | Embedding Dim | Intermediate Dim |
 |--------------|--------|------------------|----------------|------------------|
+| **0** | 1 | 1 | 16 | 32 |
 | **A** | 2 | 2 | 32 | 64 |
 | **B** | 4 | 4 | 64 | 128 |
 | **C** | 6 | 8 | 128 | 256 |
@@ -26,6 +27,19 @@ To determine a suitable model configuration, I tested **increasingly complex net
 | Dropout Probability | [0.1, 0.2, 0.4] |
 | Training Sequence Length | [12, 16, 20] |
 | Epochs | [25, 50] |
+
+## TL;DR
+
+The simplest model fails to properly learn the task. Scaling the model size improves the correct rate on the held-out (evaluation) dataset but this leads the **more complex models to overfit the expert's distribution**, leading to poor deployment performance. **_Architecture A_** provides the **_best deployment performance_**, so it is chosen as the **baseline architecture** for finer-grained hyperparemeter optimization with NNI.
+
+<figure style="display: inline-block; text-align: center;">
+  <p align="center"><img src="./results/plots/average_reward_per_architecture.svg" alt="Architectures Comparison" width="100%"></p>
+  <p align="center"><i>Average reward per achitecture.</i></p>
+</figure>
+
+# Results
+
+In what follows we skip the plots for Architecture 0 for the sake of simplicity. I note, however, that the general trends described bellow are also true for this architecture.
 
 ## Architecture A
 
