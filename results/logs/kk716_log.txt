@@ -1,0 +1,26 @@
+
+================================================================================
+MODEL LOG - kk716
+Timestamp: 2025-11-07 15:14:40
+================================================================================
+nb_actions: 4
+state_space_dim: 8
+training_seq_len: 16
+embedding_dim: 16
+token_types: 2
+num_attention_heads: 1
+intermediate_dim: 32
+hidden_dropout_prob: 0.4
+depth: 1
+seed: 7
+noise_type: none
+device: cuda
+dataset: gymnasium-ActorCritic-LunarLander-1000-16-os.pt
+learning_rate: 0.0005
+batch_size: 64
+epochs: 50
+1005: 72
+1009: 29
+1001: -28
+model location: models_architecture_0
+

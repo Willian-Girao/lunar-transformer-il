@@ -7,7 +7,9 @@ from src.utils.model_handling import get_param_sum
 
 def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader, show_param_sum=True, epoch_eval:bool=False, eval_dataloader=None) -> str:
     model_id = generate_checkpoint_id()
-    epochs_losses = []
+    epochs_train_losses = []
+    epochs_eval_losses = []
+    epochs_correct_rates = []
     epoch_iter = range(train_cfg.epochs)
 
     param_sum = get_param_sum(model=model)
@@ -36,19 +38,23 @@ def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloa
 
             epoch_loss.append(loss.item())
 
-        epochs_losses.append(np.mean(epoch_loss))
+        epochs_train_losses.append(np.mean(epoch_loss))
 
         if epoch_eval:
             eval_losses, correct_rate = eval_model(model, eval_dataloader, criterion, train_cfg)
-            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses, eval_losses, correct_rate)
+
+            epochs_eval_losses.append(eval_losses)
+            epochs_correct_rates.append(correct_rate)
+
+            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_train_losses, epochs_eval_losses, epochs_correct_rates)
 
             if train_cfg.progress:
-                epoch_iter.set_postfix({'loss': f'{epochs_losses[-1]:.10f}', 'CR': f'{correct_rate:.2f}'})
+                epoch_iter.set_postfix({'loss': f'{epochs_train_losses[-1]:.10f}', 'CR': f'{correct_rate:.2f}'})
         else:
-            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses)
+            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_train_losses)
 
             if train_cfg.progress:
-                epoch_iter.set_postfix({'loss': f'{epochs_losses[-1]:.10f}'})
+                epoch_iter.set_postfix({'loss': f'{epochs_train_losses[-1]:.10f}'})
 
     return model_id
 
@@ -76,7 +82,7 @@ def eval_model(model, eval_dataloader, criterion, train_cfg):
     eval_losses /= num_batches
     correct_rate /= size
 
-    return eval_losses, float(correct_rate)
+    return eval_losses, correct_rate
 
 def create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_losses, eval_losses=None, correct_rate=None):
     """

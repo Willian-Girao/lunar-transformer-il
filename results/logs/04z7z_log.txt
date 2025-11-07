@@ -24,3 +24,81 @@ epochs: 25
 1002: 89
 model location: models_architecture_A
 
+
+================================================================================
+MODEL LOG - 04z7z
+Timestamp: 2025-11-07 14:55:32
+================================================================================
+nb_actions: 4
+state_space_dim: 8
+training_seq_len: 16
+embedding_dim: 32
+token_types: 2
+num_attention_heads: 2
+intermediate_dim: 64
+hidden_dropout_prob: 0.2
+depth: 2
+seed: 9
+noise_type: none
+device: cuda
+dataset: gymnasium-ActorCritic-LunarLander-1000-16-os.pt
+learning_rate: 0.0005
+batch_size: 64
+epochs: 25
+1006: 105
+1004: 100
+1002: 89
+model location: models_architecture_A
+
+
+================================================================================
+MODEL LOG - 04z7z
+Timestamp: 2025-11-07 15:02:58
+================================================================================
+nb_actions: 4
+state_space_dim: 8
+training_seq_len: 16
+embedding_dim: 32
+token_types: 2
+num_attention_heads: 2
+intermediate_dim: 64
+hidden_dropout_prob: 0.2
+depth: 2
+seed: 9
+noise_type: none
+device: cuda
+dataset: gymnasium-ActorCritic-LunarLander-1000-16-os.pt
+learning_rate: 0.0005
+batch_size: 64
+epochs: 25
+1006: 105
+1004: 100
+1002: 89
+model location: models_architecture_A
+
+
+================================================================================
+MODEL LOG - 04z7z
+Timestamp: 2025-11-07 15:18:13
+================================================================================
+nb_actions: 4
+state_space_dim: 8
+training_seq_len: 16
+embedding_dim: 32
+token_types: 2
+num_attention_heads: 2
+intermediate_dim: 64
+hidden_dropout_prob: 0.2
+depth: 2
+seed: 9
+noise_type: none
+device: cuda
+dataset: gymnasium-ActorCritic-LunarLander-1000-16-os.pt
+learning_rate: 0.0005
+batch_size: 64
+epochs: 25
+1006: 105
+1004: 100
+1002: 89
+model location: models_architecture_A
+

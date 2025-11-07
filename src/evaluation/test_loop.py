@@ -1,4 +1,4 @@
-from src.utils.model_handling import load_model, get_model_dataset, update_state_action_buffers, get_model_device, init_state_action_buffers, get_models_evaluation_data
+from src.utils.model_handling import load_model, get_model_dataset, update_state_action_buffers, get_model_device, init_state_action_buffers, get_models_evaluation_data, get_model_cfg_from_checkpoint, load_checkpoint
 from src.utils.gym_env_handling import save_animation
 from src.utils.json_handling import export_config_2_json_file
 import torch, os, pickle
@@ -8,11 +8,12 @@ import warnings
 from tqdm import tqdm
 import shutil
 
-def test(test_cfg):
+def test(test_cfg, model_dir:str=None):
     """
     """
+    model_dir = 'models' if model_dir is None else model_dir
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    models_path = os.path.join(project_root, 'results', 'models')
+    models_path = os.path.join(project_root, 'results', model_dir)
 
     rewards = None
 
@@ -22,14 +23,14 @@ def test(test_cfg):
             rewards = test_model_on_multiple_envs(
                 model_id=test_cfg.model,
                 nb_test_episodes=test_cfg.nb_test_episodes,
-                sequence_length=test_cfg.sequence_length,
                 reward_per_episode=test_cfg.reward_per_episode,
-                export_animation=test_cfg.save_animation
+                export_animation=test_cfg.save_animation,
+                model_dir=model_dir
             )
 
             # Export to file.
             if test_cfg.export_to_file:
-                export_rewards_2_file(model_id=test_cfg.model, rewards=rewards, reward_per_episode=test_cfg.reward_per_episode)
+                export_rewards_2_file(model_id=test_cfg.model, rewards=rewards, reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
                 export_config_2_json_file(config=test_cfg, file_name=f'test_config-{test_cfg.model}', path=os.path.join(models_path, test_cfg.model))
         else:
             # Empty model id - test all models found in `/results/models/`.
@@ -42,14 +43,14 @@ def test(test_cfg):
                         test_model_on_multiple_envs(
                             model_id=model_id,
                             nb_test_episodes=test_cfg.nb_test_episodes,
-                            sequence_length=test_cfg.sequence_length,
                             reward_per_episode=test_cfg.reward_per_episode,
-                            export_animation=test_cfg.save_animation
+                            export_animation=test_cfg.save_animation,
+                            model_dir=model_dir
                         )
                     )
                     # Export to file.
                     if test_cfg.export_to_file:
-                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode)
+                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
                         export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
             else:
                 warnings.warn(f'No models found in {models_path}.')
@@ -64,14 +65,14 @@ def test(test_cfg):
                     test_model_on_multiple_envs(
                         model_id=model_id,
                         nb_test_episodes=test_cfg.nb_test_episodes,
-                        sequence_length=test_cfg.sequence_length,
                         reward_per_episode=test_cfg.reward_per_episode,
-                        export_animation=test_cfg.save_animation
+                        export_animation=test_cfg.save_animation,
+                        model_dir=model_dir
                     )
                 )
                 # Export to file.
                 if test_cfg.export_to_file:
-                    export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode)
+                    export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
                     export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
         else:
             # Empty list - test all models found in `/results/models/`.
@@ -84,14 +85,14 @@ def test(test_cfg):
                         test_model_on_multiple_envs(
                             model_id=model_id,
                             nb_test_episodes=test_cfg.nb_test_episodes,
-                            sequence_length=test_cfg.sequence_length,
                             reward_per_episode=test_cfg.reward_per_episode,
-                            export_animation=test_cfg.save_animation
+                            export_animation=test_cfg.save_animation,
+                            model_dir=model_dir
                         )
                     )
                     # Export to file.
                     if test_cfg.export_to_file:
-                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode)
+                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
                         export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
             else:
                 warnings.warn(f'No models found in {models_path}.')
@@ -101,24 +102,37 @@ def test(test_cfg):
 
     return rewards
 
-def test_model_on_multiple_envs(model_id:str, nb_test_episodes:int, sequence_length:int, reward_per_episode:str, export_animation:bool=False, overrride_existing:bool=True) -> dict:
+def test_model_on_multiple_envs(
+        model_id:str,
+        nb_test_episodes:int,
+        reward_per_episode:str,
+        export_animation:bool=False,
+        overrride_existing:bool=True,
+        model_dir:str=None
+    ) -> dict:
     """
     """
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+    model_dir = 'models' if model_dir is None else model_dir
 
     # Instantiate model
     # -------------------------------------------
-    model = load_model(model_id=model_id)
-    device = get_model_device(model_id=model_id)
+    model = load_model(model_id=model_id, model_dir_name=model_dir)
+    device = get_model_device(model_id=model_id, model_dir_name=model_dir)
+
+    # Load model's config
+    # -------------------------------------------
+    chkpt = load_checkpoint(model_id=model_id, model_dir_name=model_dir)
+    model_cfg = get_model_cfg_from_checkpoint(checkpoint=chkpt)
 
     # Loading training dataset (prevent data leakage)
     # -------------------------------------------
-    dataset_name = get_model_dataset(model_id=model_id) # dataset (.pt) file used for training.
+    dataset_name = get_model_dataset(model_id=model_id, model_dir_name=model_dir) # dataset (.pt) file used for training.
     dataset = torch.load(os.path.join(project_root, 'data', 'processed', dataset_name), weights_only=False)
 
     # Override existing animations
     # -------------------------------------------
-    gif_path = os.path.join(project_root, 'results', 'models', model_id, 'animations')
+    gif_path = os.path.join(project_root, 'results', model_dir, model_id, 'animations')
 
     if overrride_existing and os.path.exists(gif_path) and os.path.isdir(gif_path):
         shutil.rmtree(gif_path)
@@ -132,7 +146,15 @@ def test_model_on_multiple_envs(model_id:str, nb_test_episodes:int, sequence_len
     for rand_seed in progress:
 
         # play env
-        frames, reward_per_step, _, _, _ = play_env(device, rand_seed, model, dataset, "rgb_array" if export_animation else None, sequence_length)
+        frames, reward_per_step, _, _, _ = play_env(
+            device=device,
+            rand_seed=rand_seed,
+            model=model,
+            dataset=dataset,
+            mode="rgb_array" if export_animation else None,
+            sequence_length=model_cfg.training_seq_len
+        )
+        
         rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'accumulated' else np.array(reward_per_step)
 
         progress.set_postfix({'accumulated reward': f'{np.sum(reward_per_step):.3f}'})
@@ -199,9 +221,10 @@ def play_env(device, rand_seed, model, dataset, mode, sequence_length):
 
     return frames, reward_per_step, states, terminated, truncated
 
-def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str) -> None:
+def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str, model_dir:str=None) -> None:
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    models_path = os.path.join(project_root, 'results', 'models', model_id)
+    model_dir = 'models' if model_dir is None else model_dir
+    models_path = os.path.join(project_root, 'results', model_dir, model_id)
 
     with open(os.path.join(models_path, f'evaluation-{model_id}-reward_per_episode_{reward_per_episode}.pkl'), 'wb') as file:
         pickle.dump(rewards, file)

@@ -1,10 +1,11 @@
 from IPython.display import Image, display_html
 import ipywidgets as widgets
-from src.utils.model_handling import load_checkpoint, get_models_training_loss
+from src.utils.model_handling import load_checkpoint, get_model_training_metrics
 import time, os, pickle
 import matplotlib.pyplot as plt
 from IPython.display import display, HTML
 import numpy as np
+from typing import Union
 
 def show_gifs_in_row(model_id: str, width: int = 500, output_widget=None, models_dir_name:str=None):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -116,38 +117,6 @@ def get_all_rewards(models_dir_name:str=None):
 
     return rewards, env_seeds
 
-def plot_all_losses(cap_epoch: int = 0, tag=[]):
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    results_root = os.path.join(project_root, 'results', 'models')
-    models = sorted(os.listdir(results_root))
-
-    plt.figure(figsize=(20, 10))
-
-    for model_id in models:
-        training_loss = get_models_training_loss(model_id)
-        if len(training_loss) > cap_epoch:
-            print(model_id)
-        # cap epoch if needed
-        if cap_epoch > 0:
-            training_loss = training_loss[:cap_epoch]
-
-        # styling
-        alpha = 0.75 if model_id in tag else 0.5
-        ls = '-' if model_id in tag else '-.'
-        lw = 1.5 if model_id in tag else 0.8
-
-        plt.plot(training_loss, label=model_id, alpha=alpha, ls=ls, lw=lw)
-
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Training Loss Comparison')
-
-    # Legend outside, on the right
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=16)
-    plt.tight_layout()  # adjust to make room for legend
-    plt.show()
-
-
 def plot_rewards_tep(reward_per_step):
     # Assuming reward_per_step is a list or numpy array
     rewards = np.array(reward_per_step[:-10])
@@ -174,4 +143,55 @@ def plot_rewards_tep(reward_per_step):
 
     plt.title('Reward per Step and Accumulated Reward')
     plt.tight_layout()
+    plt.show()
+
+def plot_training_metrics(model_id: Union[str, list], title:str=None, model_dir:str=None, label: Union[str, list]='', fig_name:str=None):
+    model_dir = 'models' if model_dir is None else model_dir
+
+    if isinstance(model_id, list):
+        train_losses_list = []
+        eval_losses_list = []
+        crs_list = []
+        models_ids = []
+        for idx, mid in enumerate(model_id):
+            epochs_loss, eval_loss, correct_rate = get_model_training_metrics(model_id=mid, model_dir=model_dir)
+            train_losses_list.append(epochs_loss)
+            eval_losses_list.append(eval_loss)
+            crs_list.append(correct_rate)
+            models_ids.append(f'{mid} ({label[idx]})')
+    elif isinstance(model_id, str):
+        train_losses, eval_losses, crs = get_model_training_metrics(model_id=model_id, model_dir=model_dir)
+        train_losses_list = [train_losses]
+        eval_losses_list = [eval_losses]
+        crs_list = [crs]
+        models_ids = [f'{model_id} ({label})']
+    else:
+        raise ValueError("model_id must be a string or a list of strings.")
+
+    # Plotting
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    metrics = ['Training Loss', 'Evaluation Loss', 'Correct Rate']
+    
+    for i, metric_data in enumerate([train_losses_list, eval_losses_list, crs_list]):
+        ax = axes[i]
+        for j, data in enumerate(metric_data):
+            ax.plot(range(1, len(data)+1), data, label=models_ids[j])
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel(metrics[i])
+        ax.set_title(metrics[i])
+        if len(models_ids) > 1:
+            ax.legend()
+        ax.grid(True)
+
+    axes[-1].set_ylim(0, 1)
+
+    if title is not None:
+        plt.suptitle(title)
+
+    plt.tight_layout()
+
+    if fig_name is not None:
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+        plt.savefig(os.path.join(project_root, 'results', 'plots', fig_name))
+
     plt.show()

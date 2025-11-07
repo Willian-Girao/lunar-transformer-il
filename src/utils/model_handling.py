@@ -18,12 +18,13 @@ def save_model(checkpoint:dict, model_id:str, file_name:str) -> None:
     # Save checkpoint
     torch.save(checkpoint, model_path)
 
-def load_model(model_id:str) -> DecoderTransformer:
+def load_model(model_id:str, model_dir_name:str=None) -> DecoderTransformer:
     """
     """
     # Load checkpoint
     # -------------------------------------------
-    checkpoint = load_checkpoint(model_id=model_id)
+    model_dir_name = 'models' if model_dir_name is None else model_dir_name
+    checkpoint = load_checkpoint(model_id=model_id, model_dir_name=model_dir_name)
 
     # Instantiate model
     # -------------------------------------------
@@ -86,20 +87,22 @@ def load_checkpoint(model_id:str, model_dir_name:str=None):
 
     return checkpoint
 
-def get_model_dataset(model_id:str) -> str:
+def get_model_dataset(model_id:str, model_dir_name:str=None) -> str:
     # Load checkpoint
     # -------------------------------------------
-    checkpoint = load_checkpoint(model_id=model_id)
+    model_dir_name = 'models' if model_dir_name is None else model_dir_name
+    checkpoint = load_checkpoint(model_id=model_id, model_dir_name=model_dir_name)
 
     if 'dataset' not in checkpoint:
         raise ValueError(f"Can not find dataset name inside model's checkpoint.")
 
     return checkpoint['dataset']
 
-def get_model_device(model_id:str) -> str:
+def get_model_device(model_id:str, model_dir_name:str=None) -> str:
     # Load checkpoint
     # -------------------------------------------
-    checkpoint = load_checkpoint(model_id=model_id)
+    model_dir_name = 'models' if model_dir_name is None else model_dir_name
+    checkpoint = load_checkpoint(model_id=model_id, model_dir_name=model_dir_name)
 
     if 'device' not in checkpoint:
         raise ValueError(f"Can not find device name inside model's checkpoint.")
@@ -144,6 +147,22 @@ def get_param_sum(model: nn.Module):
 def get_models_training_loss(model_id:str):
     checkpoint = load_checkpoint(model_id)
     return checkpoint['epochs_losses']
+
+def get_model_training_metrics(model_id:str, model_dir:str=None):
+    model_dir = 'models' if model_dir is None else model_dir
+    checkpoint = load_checkpoint(model_id, model_dir)
+
+    epochs_losses = checkpoint['epochs_losses']
+
+    eval_losses = None
+    if 'eval_losses' in checkpoint:
+        eval_losses = checkpoint['eval_losses']
+
+    correct_rate = None
+    if 'correct_rate' in checkpoint:
+        correct_rate = checkpoint['correct_rate']
+    
+    return epochs_losses, eval_losses, correct_rate
 
 def get_models_evaluation_data(model_id:str, model_dir:str=None):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))

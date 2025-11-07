@@ -27,10 +27,8 @@ def main():
     # -------------------------------------------
     train_cfg = TrainingConfig()
     train_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.train_json))
-
-    len_models = len(os.listdir(os.path.join(project_root, 'results', 'models')))
     
-    for seed in range(len_models, train_cfg.nb_random_seeds+len_models):
+    for seed in range(0, train_cfg.nb_random_seeds):
         torch.manual_seed(seed)
         np.random.seed(seed)
         random.seed(seed)

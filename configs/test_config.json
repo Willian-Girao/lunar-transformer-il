@@ -1,9 +1,8 @@
 {   
-    "model": "",
+    "model": "9k4w2",
     "nb_test_episodes": 10,
     "save_animation": true,
     "env_noise": [false, ""],
-    "sequence_length": 16,
     "reward_per_episode": "all",
     "export_to_file": true
 }
