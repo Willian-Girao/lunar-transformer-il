@@ -25,29 +25,29 @@ Reinforcement learning agents are often **sample-inefficient** and **sensitive t
 
 The project pipeline consists of four main stages:
 
-### 1. Expert Acquisition :brain:
+### <span style="color: hotpink;">1. Expert Acquisition</span> :brain:
 - A pretrained (on the standard Lunar Lander environment) [actor–critic agent](https://github.com/nikhilbarhate99/Actor-Critic-PyTorch) is used.
 - This agent achieves stable landings and serves as the **expert**.
 
-### 2. Data Generation :rocket:
+### <span style="color: gray;">2. Data Generation</span> :rocket:
 - The expert policy produces 1000 trajectories of `(state, action)` tuples plus the accumulated reward per episode.
 - These episodes are padded to get fixed-length episodes, stored and later tokenized into sequences for the Transformer.
 - The normalized accumulated rewards are used to weight the losses during training.
 
-### 3. Transformer Training :robot:
+### <span style="color: orangered;">3. Transformer Training</span> :robot:
 - A **decoder-only Transformer** learns to predict the next action given the previous states and actions.
 - Coarse search determines reasonable architectural bounds (e.g., depth, heads, embedding dimension).
 - **Hyperparameter optimization (HPO)**:
   - A coarse grained HPO is done to select the baseline [network architecture](./architecture_search.md).
   - A finer grained HPO is then performed using [NNI](https://nni.readthedocs.io/).
 
-### 4. Evaluation & Generalization :video_game:
+### <span style="color: darkviolet;">4. Evaluation & Generalization</span> :video_game:
 - The trained model is compared with the expert in:
   - The **original environment**, and  
   - **Altered-gravity** variants (±10%).
 
 <p align="center">
-  <img src="data/media/pipeline.svg" alt="Pipeline Diagram" width="250">
+  <img src="data/media/pipeline_expanded.svg" alt="Pipeline Diagram" width="750">
 </p>
 
 ## Results
