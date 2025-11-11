@@ -73,7 +73,7 @@ def evaluate_fitness_with_AUC(last_state, rewards_per_step, norm_scale=500.0):
     # ----- 1. Area under reward curve -----
     # Equivalent to total accumulated reward, but integrates step-by-step
     if len(rewards) > 0:
-        area = np.trapezoid(rewards)  # trapezoidal numerical integration
+        area = np.trapz(rewards)  # trapezoidal numerical integration
     else:
         area = 0.0
 

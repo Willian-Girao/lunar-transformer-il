@@ -57,7 +57,7 @@ def main():
     classes_weights = dataset.get_classes_weights().to(device)
 
     torch.manual_seed(config_json['seed'])
-    train_dataloader = DataLoader(dataset=dataset, batch_size=params['seed'], shuffle=True)
+    train_dataloader = DataLoader(dataset=dataset, batch_size=params['batch_size'], shuffle=True)
 
     # Instantiate model
     # -------------------------------------------
@@ -99,19 +99,19 @@ def main():
     # -------------------------------------------
     test_dict = {
         "seed": config_json['seed'],
-        "model": model_id,
+        "model_id": model_id,
         'device': device,
         "nb_test_episodes": config_json['nb_test_episodes'],
         "save_animation": False,
         "env_noise": [config_json['env_noise'], ""],
         "sequence_length": params['training_seq_len'],
-        "reward_per_episode": params['reward_per_episode']
+        "reward_per_episode": config_json['reward_per_episode']
     }
     
     test_cfg = TestingConfig()
     test_cfg.from_dict(dict=test_dict)
 
-    fitnesses = test_hpo(test_cfg)
+    fitnesses = test_hpo(test_cfg, model, dataset)
 
     # Report to NNI
     # -------------------------------------------

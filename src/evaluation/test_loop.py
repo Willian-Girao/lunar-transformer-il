@@ -229,31 +229,21 @@ def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str, mo
     with open(os.path.join(models_path, f'evaluation-{model_id}-reward_per_episode_{reward_per_episode}.pkl'), 'wb') as file:
         pickle.dump(rewards, file)
 
-def test_hpo(test_cfg):
+def test_hpo(test_cfg, model, train_dataset):
     from src.hpo.custom_fitness_functions import evaluate_fitness_with_AUC
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-
-    # Instantiate model
-    # -------------------------------------------
-    model = load_model(model_id=test_cfg.model_id)
-    device = get_model_device(model_id=test_cfg.model_id)
-
-    # Loading training dataset (prevent data leakage)
-    # -------------------------------------------
-    dataset_name = get_model_dataset(model_id=test_cfg.model_id) # dataset (.pt) file used for training.
-    dataset = torch.load(os.path.join(project_root, 'data', 'processed', dataset_name), weights_only=False)
     
     # Simulate env
     # -------------------------------------------
-    test_iter = range(dataset.nb_episodes, dataset.nb_episodes+test_cfg.nb_test_episodes)
+    test_iter = range(train_dataset.nb_episodes, train_dataset.nb_episodes+test_cfg.nb_test_episodes)
     progress = tqdm(test_iter, desc=f'Testing model ID {test_cfg.model_id}', unit='env(seed)')
 
     fitnesses = []
     for rand_seed in progress:
 
         # play env
-        frames, reward_per_step, states, _, _ = play_env(device, rand_seed, model, dataset, None, test_cfg.sequence_length)
+        frames, reward_per_step, states, _, _ = play_env(test_cfg.device, rand_seed, model, train_dataset, None, test_cfg.sequence_length)
         
         fitnesses.append(evaluate_fitness_with_AUC(states[-1], reward_per_step))
 
