@@ -16,7 +16,7 @@ experiment = Experiment('local')
 
 # Configure trial code
 # --------------------------------
-experiment.config.trial_command = f'{sys.executable} C://Github//lunar-transformer-il//src//hpo//nni_optmin.py --config_json {args.config_json}'
+experiment.config.trial_command = f'{sys.executable} -m src.hpo.nni_optmin --config_json {args.config_json}'
 experiment.config.trial_code_directory = '.'
 
 # Configure search space

@@ -1,11 +1,11 @@
 {   
-    "depth": ["choice", [1, 2]],
+    "depth": ["choice", [2]],
     "num_attention_heads": ["choice", [2]],
     "embedding_dim": ["choice", [32]],
     "intermediate_dim": ["choice", [64]],
     "training_seq_len": ["choice", [14, 16, 18]],
     "lr": ["loguniform", [3.1622776601683795e-05, 3.1622776601683795e-04]],
-    "batch_size": ["choice", [64, 128]],
-    "hidden_dropout_prob": ["uniform", [0.2, 0.3]] ,
-    "epochs": ["choice", [25, 30]]
+    "batch_size": ["choice", [32, 64, 128]],
+    "hidden_dropout_prob": ["uniform", [0.15, 0.25]] ,
+    "epochs": ["choice", [20, 25, 30]]
 }
