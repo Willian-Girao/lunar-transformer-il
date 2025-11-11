@@ -230,7 +230,7 @@ def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str, mo
         pickle.dump(rewards, file)
 
 def test_hpo(test_cfg):
-    from src.hpo.custom_fitness_functions import evaluate_lander_performance
+    from src.hpo.custom_fitness_functions import evaluate_fitness_with_AUC
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
@@ -255,7 +255,7 @@ def test_hpo(test_cfg):
         # play env
         frames, reward_per_step, states, _, _ = play_env(device, rand_seed, model, dataset, None, test_cfg.sequence_length)
         
-        fitnesses.append(evaluate_lander_performance(states[-1], reward_per_step))
+        fitnesses.append(evaluate_fitness_with_AUC(states[-1], reward_per_step))
 
         progress.set_postfix({'accumulated reward': f'{np.sum(reward_per_step):.3f}'})
 
