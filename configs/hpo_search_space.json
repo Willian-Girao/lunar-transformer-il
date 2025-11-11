@@ -1,5 +1,5 @@
 {   
-    "depth": ["choice", [2]],
+    "depth": ["choice", [1, 2]],
     "num_attention_heads": ["choice", [2]],
     "embedding_dim": ["choice", [32]],
     "intermediate_dim": ["choice", [64]],

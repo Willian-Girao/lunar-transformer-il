@@ -1,9 +1,9 @@
 {   
-    "dataset": "gymnasium-ActorCritic-LunarLander-1000-16-os.pt",
+    "dataset": "gymnasium-ActorCritic-LunarLander-2000-16-os.pt",
     "learning_rate": 0.0005,
     "batch_size": 64,
     "data_shuffle": true,
-    "epochs": 15,
+    "epochs": 25,
     "progress": true,
     "subset_dataset": [false, 0],
     "epoch_eval": true,
