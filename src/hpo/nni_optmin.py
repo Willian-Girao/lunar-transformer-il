@@ -63,6 +63,7 @@ def main():
     # -------------------------------------------
     model_cfg = TransformerConfig()
     model_cfg.from_dict(dict=params)
+    model_cfg.seed = config_json['seed']
 
     model = DecoderTransformer(model_cfg).to(device)
 
