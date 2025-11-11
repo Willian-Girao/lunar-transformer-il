@@ -1,8 +1,9 @@
 import torch
-from torch.utils.data import Subset
+from torch.utils.data import Subset, Dataset
 
-def subset_dataset(dataset, nb_samples:int, seed:int=0) -> Subset:
-    """
+def subset_dataset(dataset:Dataset, nb_samples:int, seed:int=0) -> Subset:
+    """ Subsets a `torch.utils.Dataset` instance.
+    
     Returns a new dataset containing exactly `nb_samples` elements randomly
     selected from the original dataset.
 
@@ -13,6 +14,9 @@ def subset_dataset(dataset, nb_samples:int, seed:int=0) -> Subset:
 
     Returns:
         Subset: A torch.utils.data.Subset object containing nb_samples samples.
+
+    Raises:
+        ValueError: The number of samples in the subset is higher than the samples in the dataset.
     """
     if nb_samples > len(dataset):
         raise ValueError(f"Requested {nb_samples} samples, but dataset has only {len(dataset)}.")
