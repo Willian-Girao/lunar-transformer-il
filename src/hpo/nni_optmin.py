@@ -91,6 +91,7 @@ def main():
         optimizer=optimizer,
         criterion=criterion,
         train_dataloader=train_dataloader,
+        save_checkpoint=False
     )
 
     # Test model

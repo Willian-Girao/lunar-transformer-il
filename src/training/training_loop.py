@@ -5,7 +5,7 @@ import random
 import string
 from src.utils.model_handling import get_param_sum
 
-def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader, show_param_sum=True, epoch_eval:bool=False, eval_dataloader=None) -> str:
+def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloader, show_param_sum=True, epoch_eval:bool=False, eval_dataloader=None, save_checkpoint:bool=True) -> str:
     model_id = generate_checkpoint_id()
     epochs_train_losses = []
     epochs_eval_losses = []
@@ -46,12 +46,15 @@ def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloa
             epochs_eval_losses.append(eval_losses)
             epochs_correct_rates.append(correct_rate)
 
-            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_train_losses, epochs_eval_losses, epochs_correct_rates)
+            if save_checkpoint:
+                create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_train_losses, epochs_eval_losses, epochs_correct_rates)
 
             if train_cfg.progress:
                 epoch_iter.set_postfix({'loss': f'{epochs_train_losses[-1]:.10f}', 'CR': f'{correct_rate:.2f}'})
         else:
-            create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_train_losses)
+
+            if save_checkpoint:
+                create_model_checkpoint(model_id, model, model_cfg, train_cfg, optimizer, epochs_train_losses)
 
             if train_cfg.progress:
                 epoch_iter.set_postfix({'loss': f'{epochs_train_losses[-1]:.10f}'})
