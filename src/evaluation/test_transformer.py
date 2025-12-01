@@ -9,7 +9,7 @@ def main():
     from src.evaluation.test_loop import test
 
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--test_json', type=str, help='Configuration .json file describing training hyperparameters.')
+    parser.add_argument('--test_json', type=str, help='Configuration .json file describing testing hyperparameters.')
     args = parser.parse_args()
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))

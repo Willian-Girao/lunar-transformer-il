@@ -2,7 +2,8 @@
     "model": "3f48m",
     "nb_test_episodes": 10,
     "save_animation": true,
-    "env_noise": [false, ""],
+    "env_coef_of_var": 5,
+    "seed_coef_of_var": 0,
     "reward_per_episode": "all",
     "export_to_file": true,
     "sequence_length": -1

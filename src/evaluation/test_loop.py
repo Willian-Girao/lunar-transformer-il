@@ -1,6 +1,7 @@
 from src.utils.model_handling import load_model, get_model_dataset, update_state_action_buffers, get_model_device, init_state_action_buffers, get_models_evaluation_data, get_model_cfg_from_checkpoint, load_checkpoint
 from src.utils.gym_env_handling import save_animation
 from src.utils.json_handling import export_config_2_json_file
+from src.utils.gym_env_handling import sample_env_setting
 import torch, os, pickle
 import gymnasium as gym
 import numpy as np
@@ -26,7 +27,9 @@ def test(test_cfg, model_dir:str=None):
                 reward_per_episode=test_cfg.reward_per_episode,
                 export_animation=test_cfg.save_animation,
                 model_dir=model_dir,
-                sequence_length=test_cfg.sequence_length
+                sequence_length=test_cfg.sequence_length,
+                env_coef_of_var=test_cfg.env_coef_of_var,
+                seed_coef_of_var=test_cfg.seed_coef_of_var
             )
 
             # Export to file.
@@ -47,7 +50,9 @@ def test(test_cfg, model_dir:str=None):
                             reward_per_episode=test_cfg.reward_per_episode,
                             export_animation=test_cfg.save_animation,
                             model_dir=model_dir,
-                            sequence_length=test_cfg.sequence_length
+                            sequence_length=test_cfg.sequence_length,
+                            env_coef_of_var=test_cfg.env_coef_of_var,
+                            seed_coef_of_var=test_cfg.seed_coef_of_var
                         )
                     )
                     # Export to file.
@@ -70,7 +75,9 @@ def test(test_cfg, model_dir:str=None):
                         reward_per_episode=test_cfg.reward_per_episode,
                         export_animation=test_cfg.save_animation,
                         model_dir=model_dir,
-                        sequence_length=test_cfg.sequence_length
+                        sequence_length=test_cfg.sequence_length,
+                        env_coef_of_var=test_cfg.env_coef_of_var,
+                        seed_coef_of_var=test_cfg.seed_coef_of_var
                     )
                 )
                 # Export to file.
@@ -91,7 +98,9 @@ def test(test_cfg, model_dir:str=None):
                             reward_per_episode=test_cfg.reward_per_episode,
                             export_animation=test_cfg.save_animation,
                             model_dir=model_dir,
-                            sequence_length=test_cfg.sequence_length
+                            sequence_length=test_cfg.sequence_length,
+                            env_coef_of_var=test_cfg.env_coef_of_var,
+                            seed_coef_of_var=test_cfg.seed_coef_of_var
                         )
                     )
                     # Export to file.
@@ -113,7 +122,9 @@ def test_model_on_multiple_envs(
         export_animation:bool=False,
         overrride_existing:bool=True,
         model_dir:str=None,
-        sequence_length:int=-1
+        sequence_length:int=-1,
+        env_coef_of_var:float=0,
+        seed_coef_of_var:float=0
     ) -> dict:
     """
     """
@@ -137,7 +148,10 @@ def test_model_on_multiple_envs(
 
     # Override existing animations
     # -------------------------------------------
-    gif_path = os.path.join(project_root, 'results', model_dir, model_id, f'animations-sequence_length_{model_cfg.training_seq_len if sequence_length == -1 else sequence_length}')
+    gif_dir = f'animations-sequence_length_{model_cfg.training_seq_len if sequence_length == -1 else sequence_length}'
+    gif_dir += f'-env_setup-coef_of_var_{env_coef_of_var}'
+    gif_dir += f'_seed_{seed_coef_of_var}' if env_coef_of_var != 0 else ''
+    gif_path = os.path.join(project_root, 'results', model_dir, model_id, gif_dir)
 
     if overrride_existing and os.path.exists(gif_path) and os.path.isdir(gif_path):
         shutil.rmtree(gif_path)
@@ -156,8 +170,9 @@ def test_model_on_multiple_envs(
             rand_seed=rand_seed,
             model=model,
             dataset=dataset,
-            mode="rgb_array" if export_animation else None,
-            sequence_length=model_cfg.training_seq_len if sequence_length == -1 else sequence_length
+            sequence_length=model_cfg.training_seq_len if sequence_length == -1 else sequence_length,
+            env_coef_of_var=env_coef_of_var,
+            seed_coef_of_var=seed_coef_of_var
         )
         
         rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'accumulated' else np.array(reward_per_step)
@@ -171,8 +186,25 @@ def test_model_on_multiple_envs(
 
     return rewards_per_env_seed
 
-def play_env(device, rand_seed, model, dataset, mode, sequence_length):
-    env = gym.make("LunarLander-v3", render_mode=mode)
+def play_env(device, rand_seed, model, dataset, sequence_length, env_coef_of_var, seed_coef_of_var):
+
+    if env_coef_of_var == 0:
+            env = gym.make("LunarLander-v3", render_mode="rgb_array")
+    else:
+        (gravity, wind_power, turbulence_power) = sample_env_setting(
+            coef_var=env_coef_of_var,
+            seed=seed_coef_of_var
+        )
+
+        env = gym.make(
+            "LunarLander-v3",
+            render_mode="rgb_array",
+            enable_wind=True,
+            gravity=gravity,
+            wind_power=wind_power,
+            turbulence_power=turbulence_power
+        )
+
     state, info = env.reset(seed=rand_seed)
     done = False
     reward_per_step = []
