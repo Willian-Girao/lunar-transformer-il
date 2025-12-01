@@ -7,9 +7,11 @@ def main():
     from src.models.lander_actor_critic.ActorCritic import ActorCritic
     from src.evaluation.TestingConfig import TestingConfig
     from src.utils.gym_env_handling import sample_env_setting
+    from src.utils.evaluation_handling import export_rewards_2_file
     import warnings
     from tqdm import tqdm
     from src.utils.gym_env_handling import save_animation
+
     warnings.filterwarnings("ignore")
     np.bool = np.bool_
 
@@ -34,11 +36,13 @@ def main():
     test_iter = range(1000, 1000+test_cfg.nb_test_episodes) # TODO: hacky - I'm assuming that the first 1k seeds are used to generate training data. Implement this better.
     progress = tqdm(test_iter, desc=f'Testing expert', unit='env(seed)')
 
-    dir = f'env_setup-coef_of_var_{test_cfg.env_coef_of_var}' + f'_seed_{test_cfg.seed_coef_of_var}' if test_cfg.env_coef_of_var != 0 else ''
+    dir = f'env_setup-coef_of_var_{test_cfg.env_coef_of_var}'
+    dir += f'_seed_{test_cfg.seed_coef_of_var}' if test_cfg.env_coef_of_var != 0 else ''
     gif_path = os.path.join(project_root, 'results', 'expert', dir)
 
     # Multiple environment simulation
     # -----------------------------
+    rewards_per_env_seed = {}
     for seed in progress:
 
         if test_cfg.env_coef_of_var == 0:
@@ -68,14 +72,16 @@ def main():
             # Take action and update state space
             # ----------------------------------
             action = policy(observation)
-            observation, reward, terminated, truncated, info = env.step(action)
+            observation, reward_per_step, terminated, truncated, info = env.step(action)
 
-            episode_reward += reward
+            episode_reward += reward_per_step
 
             done = terminated or truncated
 
             frame = env.render()
             frames.append(frame)
+
+        rewards_per_env_seed[f'env_seed_{seed}'] = np.sum(reward_per_step) if test_cfg.reward_per_episode == 'accumulated' else np.array(reward_per_step)
 
         env.close()
 
@@ -84,6 +90,14 @@ def main():
         save_animation(
             frames=frames, path=gif_path, file_name=f'env_seed_{seed}_{int(episode_reward)}.gif'
         )
+
+    export_rewards_2_file(
+        model_id='expert',
+        rewards=rewards_per_env_seed,
+        reward_per_episode=test_cfg.reward_per_episode,
+        model_dir='',
+        env_setup=f'-{dir}'
+    )
 
 if __name__ == "__main__":
     main()

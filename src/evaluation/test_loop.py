@@ -2,6 +2,7 @@ from src.utils.model_handling import load_model, get_model_dataset, update_state
 from src.utils.gym_env_handling import save_animation
 from src.utils.json_handling import export_config_2_json_file
 from src.utils.gym_env_handling import sample_env_setting
+from src.utils.evaluation_handling import export_rewards_2_file
 import torch, os, pickle
 import gymnasium as gym
 import numpy as np
@@ -15,6 +16,9 @@ def test(test_cfg, model_dir:str=None):
     model_dir = 'models' if model_dir is None else model_dir
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
     models_path = os.path.join(project_root, 'results', model_dir)
+
+    env_setup = f'-env_setup-coef_of_var_{test_cfg.env_coef_of_var}'
+    env_setup += f'_seed_{test_cfg.seed_coef_of_var}' if test_cfg.env_coef_of_var != 0 else ''
 
     rewards = None
 
@@ -34,8 +38,18 @@ def test(test_cfg, model_dir:str=None):
 
             # Export to file.
             if test_cfg.export_to_file:
-                export_rewards_2_file(model_id=test_cfg.model, rewards=rewards, reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
-                export_config_2_json_file(config=test_cfg, file_name=f'test_config-{test_cfg.model}', path=os.path.join(models_path, test_cfg.model))
+                export_rewards_2_file(
+                    model_id=test_cfg.model,
+                    rewards=rewards,
+                    reward_per_episode=test_cfg.reward_per_episode,
+                    model_dir=model_dir,
+                    env_setup=env_setup
+                )
+                export_config_2_json_file(
+                    config=test_cfg,
+                    file_name=f'test_config-{test_cfg.model}{env_setup}',
+                    path=os.path.join(models_path, test_cfg.model)
+                )
         else:
             # Empty model id - test all models found in `/results/models/`.
             models_list = os.listdir(models_path)
@@ -57,8 +71,18 @@ def test(test_cfg, model_dir:str=None):
                     )
                     # Export to file.
                     if test_cfg.export_to_file:
-                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
-                        export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
+                        export_rewards_2_file(
+                            model_id=model_id,
+                            rewards=rewards[-1],
+                            reward_per_episode=test_cfg.reward_per_episode,
+                            model_dir=model_dir,
+                            env_setup=env_setup
+                        )
+                        export_config_2_json_file(
+                            config=test_cfg,
+                            file_name=f'test_config-{model_id}{env_setup}',
+                            path=os.path.join(models_path, model_id)
+                        )
             else:
                 warnings.warn(f'No models found in {models_path}.')
 
@@ -82,8 +106,18 @@ def test(test_cfg, model_dir:str=None):
                 )
                 # Export to file.
                 if test_cfg.export_to_file:
-                    export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
-                    export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
+                    export_rewards_2_file(
+                        model_id=model_id,
+                        rewards=rewards[-1],
+                        reward_per_episode=test_cfg.reward_per_episode,
+                        model_dir=model_dir,
+                        env_setup=env_setup
+                    )
+                    export_config_2_json_file(
+                        config=test_cfg,
+                        file_name=f'test_config-{model_id}{env_setup}',
+                        path=os.path.join(models_path, model_id)
+                    )
         else:
             # Empty list - test all models found in `/results/models/`.
             models_list = os.listdir(models_path)
@@ -105,8 +139,18 @@ def test(test_cfg, model_dir:str=None):
                     )
                     # Export to file.
                     if test_cfg.export_to_file:
-                        export_rewards_2_file(model_id=model_id, rewards=rewards[-1], reward_per_episode=test_cfg.reward_per_episode, model_dir=model_dir)
-                        export_config_2_json_file(config=test_cfg, file_name=f'test_config-{model_id}', path=os.path.join(models_path, model_id))
+                        export_rewards_2_file(
+                            model_id=model_id,
+                            rewards=rewards[-1],
+                            reward_per_episode=test_cfg.reward_per_episode,
+                            model_dir=model_dir,
+                            env_setup=env_setup
+                        )
+                        export_config_2_json_file(
+                            config=test_cfg,
+                            file_name=f'test_config-{model_id}{env_setup}',
+                            path=os.path.join(models_path, model_id)
+                        )
             else:
                 warnings.warn(f'No models found in {models_path}.')
 
@@ -257,14 +301,6 @@ def play_env(device, rand_seed, model, dataset, sequence_length, env_coef_of_var
     env.close()
 
     return frames, reward_per_step, states, terminated, truncated
-
-def export_rewards_2_file(model_id:str, rewards:dict, reward_per_episode:str, model_dir:str=None) -> None:
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    model_dir = 'models' if model_dir is None else model_dir
-    models_path = os.path.join(project_root, 'results', model_dir, model_id)
-
-    with open(os.path.join(models_path, f'evaluation-{model_id}-reward_per_episode_{reward_per_episode}.pkl'), 'wb') as file:
-        pickle.dump(rewards, file)
 
 def test_hpo(test_cfg, model, train_dataset):
     from src.hpo.custom_fitness_functions import evaluate_fitness_with_AUC
