@@ -65,16 +65,17 @@ def main():
         np.random.seed(seed)
         observation, info = env.reset(seed=seed)
         episode_reward = 0.0
-
+        
+        reward_per_step = []
         frames = []
         done = False
         while not done:
             # Take action and update state space
             # ----------------------------------
             action = policy(observation)
-            observation, reward_per_step, terminated, truncated, info = env.step(action)
+            observation, reward, terminated, truncated, info = env.step(action)
 
-            episode_reward += reward_per_step
+            reward_per_step.append(reward)
 
             done = terminated or truncated
 
@@ -85,10 +86,10 @@ def main():
 
         env.close()
 
-        progress.set_postfix({'episode total reward': f'{int(episode_reward)}'})
+        progress.set_postfix({'episode total reward': f'{int(np.sum(reward_per_step))}'})
 
         save_animation(
-            frames=frames, path=gif_path, file_name=f'env_seed_{seed}_{int(episode_reward)}.gif'
+            frames=frames, path=gif_path, file_name=f'env_seed_{seed}_{int(np.sum(reward_per_step))}.gif'
         )
 
     export_rewards_2_file(
