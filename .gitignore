@@ -165,3 +165,4 @@ data/raw/*
 data/processed/*
 results/models*/*
 results/model*
+results/expert/*
