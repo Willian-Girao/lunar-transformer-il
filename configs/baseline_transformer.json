@@ -3,12 +3,12 @@
     "seed": 9,
     "nb_actions": 4,
     "state_space_dim": 8,
-    "training_seq_len": 16,
+    "training_seq_len": 14,
     "token_types": 2,
-    "depth": 2,
+    "depth": 4,
     "num_attention_heads": 2,
     "embedding_dim": 32,
     "intermediate_dim": 64,
-    "hidden_dropout_prob": 0.2,
+    "hidden_dropout_prob": 0.299778012346364,
     "noise_type": "none"
 }

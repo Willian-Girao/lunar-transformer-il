@@ -1,0 +1,6 @@
+All outputs from your experiments.
+results/models/ → .pth model checkpoints for both actor-critic and transformer models.
+To be added later:
+- results/logs/ → TensorBoard / wandb logs
+- results/plots/ → Training curves, reward plots, etc.
+- results/tables/ → CSV summaries of metrics or hyperparameter sweeps.

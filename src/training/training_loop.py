@@ -16,7 +16,7 @@ def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloa
     show = f' (param. sum {param_sum:.3f})' if show_param_sum else ''
 
     if train_cfg.progress:
-        epoch_iter = tqdm(epoch_iter, desc=f'Training model ID {model_id} ({model_cfg.depth} {model_cfg.num_attention_heads} {model_cfg.embedding_dim} {model_cfg.intermediate_dim}) seed {model_cfg.seed} {show}', unit='epoch')
+        epoch_iter = tqdm(epoch_iter, desc=f'(device {train_cfg.device}) Training model ID {model_id} ({model_cfg.depth} {model_cfg.num_attention_heads} {model_cfg.embedding_dim} {model_cfg.intermediate_dim}) seed {model_cfg.seed} {show}', unit='epoch')
 
     model.train()
     for ep in epoch_iter:

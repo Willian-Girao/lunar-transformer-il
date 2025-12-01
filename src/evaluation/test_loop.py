@@ -25,7 +25,8 @@ def test(test_cfg, model_dir:str=None):
                 nb_test_episodes=test_cfg.nb_test_episodes,
                 reward_per_episode=test_cfg.reward_per_episode,
                 export_animation=test_cfg.save_animation,
-                model_dir=model_dir
+                model_dir=model_dir,
+                sequence_length=test_cfg.sequence_length
             )
 
             # Export to file.
@@ -45,7 +46,8 @@ def test(test_cfg, model_dir:str=None):
                             nb_test_episodes=test_cfg.nb_test_episodes,
                             reward_per_episode=test_cfg.reward_per_episode,
                             export_animation=test_cfg.save_animation,
-                            model_dir=model_dir
+                            model_dir=model_dir,
+                            sequence_length=test_cfg.sequence_length
                         )
                     )
                     # Export to file.
@@ -67,7 +69,8 @@ def test(test_cfg, model_dir:str=None):
                         nb_test_episodes=test_cfg.nb_test_episodes,
                         reward_per_episode=test_cfg.reward_per_episode,
                         export_animation=test_cfg.save_animation,
-                        model_dir=model_dir
+                        model_dir=model_dir,
+                        sequence_length=test_cfg.sequence_length
                     )
                 )
                 # Export to file.
@@ -87,7 +90,8 @@ def test(test_cfg, model_dir:str=None):
                             nb_test_episodes=test_cfg.nb_test_episodes,
                             reward_per_episode=test_cfg.reward_per_episode,
                             export_animation=test_cfg.save_animation,
-                            model_dir=model_dir
+                            model_dir=model_dir,
+                            sequence_length=test_cfg.sequence_length
                         )
                     )
                     # Export to file.
@@ -108,7 +112,8 @@ def test_model_on_multiple_envs(
         reward_per_episode:str,
         export_animation:bool=False,
         overrride_existing:bool=True,
-        model_dir:str=None
+        model_dir:str=None,
+        sequence_length:int=-1
     ) -> dict:
     """
     """
@@ -132,7 +137,7 @@ def test_model_on_multiple_envs(
 
     # Override existing animations
     # -------------------------------------------
-    gif_path = os.path.join(project_root, 'results', model_dir, model_id, 'animations')
+    gif_path = os.path.join(project_root, 'results', model_dir, model_id, f'animations-sequence_length_{model_cfg.training_seq_len if sequence_length == -1 else sequence_length}')
 
     if overrride_existing and os.path.exists(gif_path) and os.path.isdir(gif_path):
         shutil.rmtree(gif_path)
@@ -152,7 +157,7 @@ def test_model_on_multiple_envs(
             model=model,
             dataset=dataset,
             mode="rgb_array" if export_animation else None,
-            sequence_length=model_cfg.training_seq_len
+            sequence_length=model_cfg.training_seq_len if sequence_length == -1 else sequence_length
         )
         
         rewards_per_env_seed[f'env_seed_{rand_seed}'] = np.sum(reward_per_step) if reward_per_episode == 'accumulated' else np.array(reward_per_step)
