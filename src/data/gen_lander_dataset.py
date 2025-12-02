@@ -3,22 +3,24 @@ def main():
     import pickle, torch, os, re
     import numpy as np
     from src.data.LanderDataset import LanderDataset
+    from src.utils.json_handling import json_2_dict
     import argparse
 
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--training_seq_len', type=int, help='Number of sequential state vectors and actions interleaved to create an input sequence. Must be an even integer greater than 2.', default=12)
-    parser.add_argument("--normalize", action="store_false", help='Whether or not the first 6 dimensions of the state space vectors are normalized.')
-    parser.add_argument("--overlapping_seqs", action="store_false", help='Whether or not training sequences are created using a sliding window or are completely disjoint.')
+    parser.add_argument('--dataset_gen_json', type=str, help='Configuration .json file describing the parameters for dataset generation.')
     args = parser.parse_args()
 
-    if args.training_seq_len <= 2 or args.training_seq_len % 2 != 0:
-        raise ValueError(f'--training_seq_len must be an even integer greater than 2 (got {args.training_seq_len}).')
+    config = json_2_dict(os.path.join(project_root, 'configs', args.dataset_gen_json))
+
+    if config['training_seq_len'] <= 2 or config['training_seq_len'] % 2 != 0:
+        training_seq_len = config['training_seq_len']
+        raise ValueError(f'--training_seq_len must be an even integer greater than 2 (got {training_seq_len}).')
 
     # Load the raw data
     # -------------------------------------------
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    dataset_name = 'gymnasium-ActorCritic-LunarLander-1000.pkl'
-    path = os.path.join(project_root, 'data', 'raw', dataset_name)
+    path = os.path.join(project_root, 'data', 'raw', config['expert_data_file'])
 
     with open(path, 'rb') as file:
         lunarland_expert_data = pickle.load(file)
@@ -27,7 +29,7 @@ def main():
     # -------------------------------------------
     mean = None
     std = None
-    if args.normalize:
+    if config['normalize']:
         continuous_states = lunarland_expert_data['X'][..., :6]  # take first 6 features
 
         # Compute mean and std across all samples and timesteps (flatten N and T)
@@ -56,17 +58,17 @@ def main():
         actions=lunarland_expert_data['Y'],
         padding_start=lunarland_expert_data['padding_idxs'],
         weights=weights,
-        seq_len=args.training_seq_len,
-        normalized=args.normalize,
+        seq_len=config['training_seq_len'],
+        normalized=config['normalize'],
         mean=mean,
         std=std,
-        overlapping_seqs=args.overlapping_seqs)
+        overlapping_seqs=config['overlapping_seqs'])
     
-    seq_type = 'os' if args.overlapping_seqs else 'ds'
+    seq_type = 'os' if config['overlapping_seqs'] else 'ds'
 
     os.makedirs(os.path.join(project_root, 'data', 'processed'), exist_ok=True)
     
-    file_name = dataset_name.replace('.pkl', f'-{args.training_seq_len}-{seq_type}.pt')
+    file_name = config['expert_data_file'].replace('.pkl', f'-{config['training_seq_len']}-{seq_type}.pt')
     path = os.path.join(project_root, 'data', 'processed', file_name)
     torch.save(dataset, path)
     print(f'... exported to: {path}')
