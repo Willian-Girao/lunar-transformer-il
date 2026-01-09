@@ -1,0 +1,10 @@
+{
+    "intermediate_dim": 128,
+    "embedding_dim": 64,
+    "num_attention_heads": 2,
+    "training_seq_len": 14,
+    "inference_seq_len": 12,
+    "lr": 0.000793,
+    "hidden_dropout_prob": 0.157674,
+    "epochs": 60
+}

@@ -1,10 +1,10 @@
 
 def main():
+    import os
     import torch.optim as optim
     from torch.utils.data import DataLoader
     import torch, nni
     import numpy as np
-    import os
     from src.evaluation.test_loop import test_hpo
     import argparse
     from src.utils.json_handling import json_2_dict
@@ -27,16 +27,15 @@ def main():
 
     # Hyperparameters to be tuned
     # ---------------------------
-    params = {   
-        "depth": 2,
-        "num_attention_heads": 2,
-        "embedding_dim": 32,
+    params = {
         "intermediate_dim": 64,
-        "training_seq_len": 16,
+        "embedding_dim": 32,
+        "num_attention_heads": 2,
+        "training_seq_len": 14,
+        "inference_seq_len": 14,
         "lr": 5e-4,
-        "batch_size": 64,
         "hidden_dropout_prob": 0.2,
-        "epochs": 25
+        "epochs": 60
     }
 
     # Get optimized hyperparameters
@@ -57,10 +56,11 @@ def main():
     classes_weights = dataset.get_classes_weights().to(device)
 
     torch.manual_seed(config_json['seed'])
-    train_dataloader = DataLoader(dataset=dataset, batch_size=params['batch_size'], shuffle=True)
+    train_dataloader = DataLoader(dataset=dataset, batch_size=64, shuffle=True)
 
     # Instantiate model
     # -------------------------------------------
+    params['depth'] = 1
     model_cfg = TransformerConfig()
     model_cfg.from_dict(dict=params)
     model_cfg.seed = config_json['seed']
@@ -79,7 +79,7 @@ def main():
 
     train_cfg['seed'] = config_json['seed']
     train_cfg['learning_rate'] = params['lr']
-    train_cfg['batch_size'] = params['batch_size']
+    train_cfg['batch_size'] = 64
     train_cfg['epochs'] = params['epochs']
     train_cfg['device'] = device
 
@@ -104,7 +104,7 @@ def main():
         "nb_test_episodes": config_json['nb_test_episodes'],
         "save_animation": False,
         "env_noise": [config_json['env_noise'], ""],
-        "sequence_length": params['training_seq_len'],
+        "sequence_length": params['inference_seq_len'],
         "reward_per_episode": config_json['reward_per_episode']
     }
     
@@ -118,4 +118,11 @@ def main():
     nni.report_final_result(np.mean(fitnesses))
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    try:
+        main()
+    except Exception as e:
+        # DO NOT report final result here
+        print(e)
+        sys.exit(1)
