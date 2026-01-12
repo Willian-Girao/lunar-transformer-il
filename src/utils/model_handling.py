@@ -164,7 +164,7 @@ def get_model_training_metrics(model_id:str, model_dir:str=None):
     
     return epochs_losses, eval_losses, correct_rate
 
-def get_models_evaluation_data(model_id:str, model_dir:str=None):
+def get_models_evaluation_data(model_id:str, infer_seq_len:int, model_dir:str=None):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
     model_path = os.path.join(
         project_root,
@@ -176,7 +176,7 @@ def get_models_evaluation_data(model_id:str, model_dir:str=None):
     
     matching_file = None
     for f in files:
-        if f.startswith(f"evaluation-{model_id}") and f.endswith(".pkl"):
+        if f.startswith(f"evaluation-{infer_seq_len}-{model_id}") and f.endswith(".pkl"):
             matching_file = f
             break
 
@@ -188,3 +188,9 @@ def get_models_evaluation_data(model_id:str, model_dir:str=None):
         eval_data = pickle.load(f)
     
     return eval_data
+
+def get_model_cfg(model_id:str):
+    """
+    """
+    checkpoint = load_checkpoint(model_id=model_id)
+    return get_model_cfg_from_checkpoint(checkpoint=checkpoint)

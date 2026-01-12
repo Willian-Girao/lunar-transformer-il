@@ -53,9 +53,18 @@ The project pipeline consists of four main stages:
 
 ## Results
 
+Check [here](./baseline_vs_expert.md) for the full comparison between the baseline transformer model vs the expert.
+
+Figure 4 shows the mean rewards (for 10 different environment seeds) and their standard deviations — for the two best transformer models — as the context window (sequence length) during deployment is varied. The best model (ny546) performs on par with the expert.
+
+<figure style="display: inline-block; text-align: center;">
+  <p align="center"><img src="results/plots/baseline_vs_expert/baseline-v1_infer_seq_len.svg" alt="Transformer Pilot" width="100%"></p>
+  <p align="center"><i>Figure 4: Baseline transformers perform better with smaller context window (relative to the training length, shown in red).</i></p>
+</figure>
+
 ### Key Insight: Train-Long, Test-Short Improves Robustness
 
-Although the best model was **trained with sequence length = 12**, it achieved **higher returns during deployment** when the inference context was **shortened to 6**.
+Although the best model was **trained with sequence length = 14**, it achieved **higher returns during deployment** when the inference context was **shortened to 6**.
 
 > **Hypothesis:**  
 > Shorter inference contexts act as a *regularizer*, limiting the propagation of compounding errors and reducing the influence of outdated states — mitigating distribution-shift noise common in imitation learning.

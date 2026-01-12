@@ -1,10 +1,10 @@
 {   
-    "model": "3f48m",
+    "model": "f51t5",
     "nb_test_episodes": 10,
     "save_animation": true,
-    "env_coef_of_var": 40,
+    "env_coef_of_var": 0,
     "seed_coef_of_var": 0,
     "reward_per_episode": "all",
     "export_to_file": true,
-    "sequence_length": -1
+    "sequence_length": 14
 }

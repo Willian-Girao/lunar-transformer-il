@@ -40,12 +40,13 @@ def test(test_cfg, model_dir:str=None):
             if test_cfg.export_to_file:
                 export_rewards_2_file(
                     model_id=test_cfg.model,
+                    infer_seq_len=test_cfg.sequence_length,
                     rewards=rewards,
                     reward_per_episode=test_cfg.reward_per_episode,
                     model_dir=model_dir,
                     env_setup=env_setup
                 )
-                export_config_2_json_file(
+                export_config_2_json_file( # TODO config is overriden if inference seq. leng. changes.
                     config=test_cfg,
                     file_name=f'test_config-{test_cfg.model}{env_setup}',
                     path=os.path.join(models_path, test_cfg.model)
@@ -73,6 +74,7 @@ def test(test_cfg, model_dir:str=None):
                     if test_cfg.export_to_file:
                         export_rewards_2_file(
                             model_id=model_id,
+                            infer_seq_len=test_cfg.sequence_length,
                             rewards=rewards[-1],
                             reward_per_episode=test_cfg.reward_per_episode,
                             model_dir=model_dir,
@@ -108,6 +110,7 @@ def test(test_cfg, model_dir:str=None):
                 if test_cfg.export_to_file:
                     export_rewards_2_file(
                         model_id=model_id,
+                        infer_seq_len=test_cfg.sequence_length,
                         rewards=rewards[-1],
                         reward_per_episode=test_cfg.reward_per_episode,
                         model_dir=model_dir,
@@ -141,6 +144,7 @@ def test(test_cfg, model_dir:str=None):
                     if test_cfg.export_to_file:
                         export_rewards_2_file(
                             model_id=model_id,
+                            infer_seq_len=test_cfg.sequence_length,
                             rewards=rewards[-1],
                             reward_per_episode=test_cfg.reward_per_episode,
                             model_dir=model_dir,
