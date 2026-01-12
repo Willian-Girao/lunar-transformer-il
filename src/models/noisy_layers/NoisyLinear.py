@@ -10,7 +10,8 @@ class NoisyLinear(nn.Module):
         super().__init__()
 
         self.size_in, self.size_out = size_in, size_out
-        self.noise_scale = getattr(config, 'noise_scale', 1.0)
+
+        self.device = config.device
 
         k = 1 / size_in
 
@@ -46,11 +47,16 @@ class NoisyLinear(nn.Module):
 
         # Add noise *before* bias (i.e., to the pre-activation).
         if self.training and self.noise_fn is not None and noise_seed is not None:
-            gen = torch.Generator()
+            gen = torch.Generator(device=self.device)
             gen.manual_seed(noise_seed)
 
             # Noise per sample × per neuron.
-            noise = self.noise_fn(x.size(0), self.size_out, generator=gen) * self.noise_scale
+            noise = self.noise_fn(
+                pre_activation.size(0),
+                pre_activation.size(1),
+                pre_activation.size(2),
+                generator=gen,
+                device=self.device)
 
             # Adjust for mean/std if normal.
             if self.noise_fn == torch.randn:

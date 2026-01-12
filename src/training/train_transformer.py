@@ -61,6 +61,7 @@ def main():
 
     # Instantiate model
     # -------------------------------------------
+    model_cfg.device = train_cfg.device
     transformer = DecoderTransformer(model_cfg).to(train_cfg.device)
 
     # Set criterion and optimizer
