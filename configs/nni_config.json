@@ -1,5 +1,5 @@
 {   
-    "experiment_name": "HPO_lander_baseline",
+    "experiment_name": "HPO_lander_noise",
     "tuner_name": "TPE",
     "optimize_mode": "maximize",
     "max_trial_number": 100,
