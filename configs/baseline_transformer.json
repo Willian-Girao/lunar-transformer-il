@@ -1,6 +1,6 @@
 {
     "name": "baseline-v1",
-    "seed": 9,
+    "seed": 8,
     "nb_actions": 4,
     "state_space_dim": 8,
     "training_seq_len": 14,

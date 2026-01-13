@@ -63,6 +63,7 @@ def main():
     params['hidden_dropout_prob'] = 0.157674
     params['lr'] = 0.000793
     params['epochs'] = 60
+    params['noise_type'] = "normal"
     
     model_cfg = TransformerConfig()
     model_cfg.from_dict(dict=params)

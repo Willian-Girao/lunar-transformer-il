@@ -2,12 +2,12 @@
     "experiment_name": "HPO_lander_noise",
     "tuner_name": "TPE",
     "optimize_mode": "maximize",
-    "max_trial_number": 100,
-    "trial_concurrency": 1,
+    "max_trial_number": 200,
+    "trial_concurrency": 2,
     "port": 8081,
     "seed": 9,
     "dataset": "",
-    "nb_test_episodes": 10,
+    "nb_test_episodes": 20,
     "env_noise": false,
     "reward_per_episode": "all"
 }
