@@ -234,7 +234,7 @@ def test_model_on_multiple_envs(
 
     return rewards_per_env_seed
 
-def play_env(device, rand_seed, model, dataset, sequence_length, env_coef_of_var, seed_coef_of_var):
+def play_env(device, rand_seed, model, dataset, sequence_length, env_coef_of_var=0, seed_coef_of_var=0):
 
     if env_coef_of_var == 0:
             env = gym.make("LunarLander-v3", render_mode="rgb_array")
@@ -320,7 +320,7 @@ def test_hpo(test_cfg, model, train_dataset):
     for rand_seed in progress:
 
         # play env
-        frames, reward_per_step, states, _, _ = play_env(test_cfg.device, rand_seed, model, train_dataset, None, test_cfg.sequence_length)
+        frames, reward_per_step, states, _, _ = play_env(test_cfg.device, rand_seed, model, train_dataset, test_cfg.sequence_length)
         
         fitnesses.append(evaluate_fitness_with_AUC(states[-1], reward_per_step))
 
