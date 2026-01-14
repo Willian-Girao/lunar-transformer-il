@@ -108,7 +108,7 @@ def main():
         "nb_test_episodes": config_json['nb_test_episodes'],
         "save_animation": False,
         "env_noise": [config_json['env_noise'], ""],
-        "sequence_length": 14,
+        "sequence_length": 12,
         "reward_per_episode": config_json['reward_per_episode']
     }
     
