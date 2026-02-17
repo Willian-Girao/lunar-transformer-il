@@ -52,24 +52,24 @@ def main():
 
     # Instantiate model
     # -------------------------------------------
-    model_cfg = {}
-    model_cfg['nb_actions'] = 4
-    model_cfg['state_space_dim'] = 8
-    model_cfg['training_seq_len'] = 14
-    model_cfg['token_types'] = 2
-    model_cfg['depth'] = 1
-    model_cfg['num_attention_heads'] = 2
-    model_cfg['embedding_dim'] = 64
-    model_cfg['intermediate_dim'] = 128
-    model_cfg['hidden_dropout_prob'] = 0.157674
-    model_cfg['lr'] = 0.000793
-    model_cfg['epochs'] = 60
-    model_cfg['noise_type'] = "normal"
-    model_cfg['noise_mean'] = params["noise_mean"]
-    model_cfg['noise_std'] = params["noise_std"]
+    model_cfg_dict = {}
+    model_cfg_dict['nb_actions'] = 4
+    model_cfg_dict['state_space_dim'] = 8
+    model_cfg_dict['training_seq_len'] = 14
+    model_cfg_dict['token_types'] = 2
+    model_cfg_dict['depth'] = 1
+    model_cfg_dict['num_attention_heads'] = 2
+    model_cfg_dict['embedding_dim'] = 64
+    model_cfg_dict['intermediate_dim'] = 128
+    model_cfg_dict['hidden_dropout_prob'] = 0.157674
+    model_cfg_dict['lr'] = 0.000793
+    model_cfg_dict['epochs'] = 60
+    model_cfg_dict['noise_type'] = "normal"
+    model_cfg_dict['noise_mean'] = params["noise_mean"]
+    model_cfg_dict['noise_std'] = params["noise_std"]
     
     model_cfg = TransformerConfig()
-    model_cfg.from_dict(dict=model_cfg)
+    model_cfg.from_dict(dict=model_cfg_dict)
     model_cfg.seed = config_json['seed']
 
     model = DecoderTransformer(model_cfg).to(device)
