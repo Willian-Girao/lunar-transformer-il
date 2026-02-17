@@ -46,5 +46,5 @@ experiment.run(config_json['port'])
 
 # After the experiment is done
 # ----------------------------
-input('NNI optimization done. Press enter to quit...')
+# input('NNI optimization done. Press enter to quit...')
 experiment.stop()

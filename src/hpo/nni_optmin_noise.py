@@ -52,21 +52,24 @@ def main():
 
     # Instantiate model
     # -------------------------------------------
-    params['nb_actions'] = 4
-    params['state_space_dim'] = 8
-    params['training_seq_len'] = 14
-    params['token_types'] = 2
-    params['depth'] = 1
-    params['num_attention_heads'] = 2
-    params['embedding_dim'] = 64
-    params['intermediate_dim'] = 128
-    params['hidden_dropout_prob'] = 0.157674
-    params['lr'] = 0.000793
-    params['epochs'] = 60
-    params['noise_type'] = "normal"
+    model_cfg = {}
+    model_cfg['nb_actions'] = 4
+    model_cfg['state_space_dim'] = 8
+    model_cfg['training_seq_len'] = 14
+    model_cfg['token_types'] = 2
+    model_cfg['depth'] = 1
+    model_cfg['num_attention_heads'] = 2
+    model_cfg['embedding_dim'] = 64
+    model_cfg['intermediate_dim'] = 128
+    model_cfg['hidden_dropout_prob'] = 0.157674
+    model_cfg['lr'] = 0.000793
+    model_cfg['epochs'] = 60
+    model_cfg['noise_type'] = "normal"
+    model_cfg['noise_mean'] = params["noise_mean"]
+    model_cfg['noise_std'] = params["noise_std"]
     
     model_cfg = TransformerConfig()
-    model_cfg.from_dict(dict=params)
+    model_cfg.from_dict(dict=model_cfg)
     model_cfg.seed = config_json['seed']
 
     model = DecoderTransformer(model_cfg).to(device)
@@ -74,7 +77,7 @@ def main():
     # Set criterion and optimizer
     # -------------------------------------------
     criterion = torch.nn.CrossEntropyLoss(weight=classes_weights, reduction="none")
-    optimizer = optim.Adam(model.parameters(), lr=params['lr'])
+    optimizer = optim.Adam(model.parameters(), lr=model_cfg['lr'])
 
     # Load the training loop configuration file
     # -------------------------------------------
@@ -82,9 +85,9 @@ def main():
     train_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.config_json))
 
     train_cfg['seed'] = config_json['seed']
-    train_cfg['learning_rate'] = params['lr']
+    train_cfg['learning_rate'] = model_cfg['lr']
     train_cfg['batch_size'] = 64
-    train_cfg['epochs'] = params['epochs']
+    train_cfg['epochs'] = model_cfg['epochs']
     train_cfg['device'] = device
 
     # Run training loop

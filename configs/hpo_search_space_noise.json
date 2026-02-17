@@ -1,4 +1,4 @@
 {
     "noise_mean": ["uniform", [-1.0, 1.0]],
-    "noise_std": ["uniform", [0, 1.0]]
+    "noise_std": ["uniform", [0, 3.0]]
 }

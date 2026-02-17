@@ -1,0 +1,60 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) 2023.01   2) StdEnv
+[2026-02-05 16:40:31] [32mCreating experiment, Experiment ID: [36m7qd1cnt8[0m
+[2026-02-05 16:40:31] [32mStarting web server...[0m
+[2026-02-05 16:40:32] [33mWARNING: Timeout, retry...[0m
+[2026-02-05 16:40:33] [33mWARNING: Timeout, retry...[0m
+[2026-02-05 16:40:34] [32mSetting up...[0m
+[2026-02-05 16:40:35] [32mWeb portal URLs: [36mhttp://127.0.0.1:8082 http://172.23.12.25:8082 http://10.5.3.222:8082[0m
+[2026-02-05 16:57:36] [32mStopping experiment, please wait...[0m
+[2026-02-05 16:57:36] [32mSaving experiment checkpoint...[0m
+[2026-02-05 16:57:36] [32mStopping NNI manager, if any...[0m
+[2026-02-05 16:57:40] [32mExperiment stopped.[0m
+
+###############################################################################
+Hábrók Cluster
+Job 27045554 for user p302242
+Finished at: Thu Feb  5 16:57:44 CET 2026
+
+Job details:
+============
+
+Job ID                         : 27045554
+Name                           : nni-IL
+User                           : p302242
+Partition                      : gpulong
+Nodes                          : a100gpu2
+Number of Nodes                : 1
+Cores                          : 16
+Number of Tasks                : 1
+State                          : COMPLETED  
+Submit                         : 2026-02-05T16:09:54
+Start                          : 2026-02-05T16:40:12
+End                            : 2026-02-05T16:57:40
+Reserved walltime              : 3-00:00:00
+Used walltime                  :   00:17:28
+Used CPU time                  :   00:36:25 (Efficiency: 13.03%)
+% User (Computation)           : 86.45%
+% System (I/O)                 : 13.55%
+Total memory reserved          : 18G
+Maximum memory used            : 3.93G
+Requested GPUs                 : a100=2
+Allocated GPUs                 : a100=2
+Max GPU utilization            : 3%
+Max GPU memory used            : 832.00M
+Hints and tips      :
+ 1) The GPU utilization is low, please check if your code can be optimized,
+    or if you can move your input data to fast local storage.
+ *) For more information on these issues see:
+    https://wiki.hpc.rug.nl/habrok/additional_information/job_hints
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Hábrók in your publications:
+
+https://wiki.hpc.rug.nl/habrok/introduction/scientific_output
+
+################################################################################
