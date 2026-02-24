@@ -3,7 +3,7 @@ import json
 import torch
 from typing import Union
 
-def json_2_dict(json_file: str) -> dict:
+def json_2_dict(json_file: str, subfolder:str=None) -> dict:
     """ Transforms a .json file into a dictionary.
 
     This does not support nested keys.
@@ -12,7 +12,11 @@ def json_2_dict(json_file: str) -> dict:
         json_file (str): The name of the .json file to be opened.
     """
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-    json_path = os.path.join(project_root, 'configs', json_file)
+    
+    if subfolder:
+        json_path = os.path.join(project_root, 'configs', subfolder, json_file)
+    else:
+        json_path = os.path.join(project_root, 'configs', json_file)
 
     with open(json_path) as f:
         json_config = json.load(f)
