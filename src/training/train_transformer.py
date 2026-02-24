@@ -19,6 +19,13 @@ def main():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('--transformer_json', type=str, help='Configuration .json file describing the transformer hyperparameters.')
     parser.add_argument('--train_json', type=str, help='Configuration .json file describing training hyperparameters.')
+    parser.add_argument(
+        '--env',
+        type=str,
+        choices=['lunar', 'cheetah'],
+        required=True,
+        help='Model type: expert or transformer.'
+    )
     args = parser.parse_args()
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -26,12 +33,12 @@ def main():
     # Load the transformer's configuration file
     # -------------------------------------------
     model_cfg = TransformerConfig()
-    model_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.transformer_json))
+    model_cfg.from_json(json_file=os.path.join(project_root, 'configs', 'transformer', args.transformer_json))
 
     # Load the training loop configuration file
     # -------------------------------------------
     train_cfg = TrainingConfig()
-    train_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.train_json))
+    train_cfg.from_json(json_file=os.path.join(project_root, 'configs', 'training', args.train_json))
     train_cfg.seed = model_cfg.seed # TODO train_cfg.seed overrides the model's during checkpoint save.
 
     torch.manual_seed(model_cfg.seed)
@@ -43,7 +50,6 @@ def main():
     # We load a custom Dataset subclass. Requires pickle, so weights_only=False is necessary.
     # The file is locally generated and trusted.
     train_dataset = torch.load(os.path.join(project_root, 'data', 'processed', train_cfg.dataset), weights_only=False)
-    classes_weights = train_dataset.get_classes_weights().to(train_cfg.device)
 
     if train_dataset.seq_len != model_cfg.training_seq_len:
         raise ValueError(f'Dataset sequence length ({train_dataset.seq_len}) differs from the sequence length set for the transformer ({model_cfg.training_seq_len}).')
@@ -62,11 +68,18 @@ def main():
     # Instantiate model
     # -------------------------------------------
     model_cfg.device = train_cfg.device
-    transformer = DecoderTransformer(model_cfg).to(train_cfg.device)
+    transformer = DecoderTransformer(config=model_cfg, env=args.env).to(train_cfg.device)
 
     # Set criterion and optimizer
     # -------------------------------------------
-    criterion = torch.nn.CrossEntropyLoss(weight=classes_weights, reduction="none")
+    if args.env == 'lunar':
+        classes_weights = train_dataset.get_classes_weights().to(train_cfg.device)
+        criterion = torch.nn.CrossEntropyLoss(weight=classes_weights, reduction="none")
+    elif args.env == 'cheetah':
+        criterion = torch.nn.MSELoss(reduction="none")
+    else:
+        raise ValueError(f'Environment {args.env} not recognized.')
+
     optimizer = optim.Adam(transformer.parameters(), lr=train_cfg.learning_rate)
 
     # Run training loop

@@ -29,9 +29,15 @@ def train_model(train_cfg, model_cfg, model, optimizer, criterion, train_dataloa
             masks_batch = masks_batch.to(train_cfg.device)
             reward = reward.to(train_cfg.device)
 
+            labels_batch = labels_batch.float() # TODO: validate this works with the lander too
+
             optimizer.zero_grad()
             logits = model(states_seq=states_batch, actions_seq=actions_batch, padding_mask=masks_batch, noise_seed=ith_batch)
             loss = criterion(logits, labels_batch)
+            
+            if len(loss.shape) > 1: # TODO: validate this works with the lander too
+                reward = reward.unsqueeze(1)
+
             loss = (loss * reward).mean()
             loss.backward()
             optimizer.step()

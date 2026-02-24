@@ -1,15 +1,22 @@
 import torch.nn as nn
 import torch
 from src.models.decoder_only_transformer.LanderEmbedding import LanderEmbedding
+from src.models.decoder_only_transformer.CheetahEmbedding import CheetahEmbedding
 from src.models.decoder_only_transformer.TransformerLayer import TransformerLayer
 from src.models.noisy_layers.NoisyLinear import NoisyLinear
 
 class DecoderTransformer(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, env:str):
         super().__init__()
         torch.manual_seed(config.seed)
-
-        self.embedding_layer = LanderEmbedding(config)
+        
+        if env == 'lunar':
+            self.embedding_layer = LanderEmbedding(config)
+        elif env == 'cheetah':
+            self.embedding_layer = CheetahEmbedding(config)
+        else:
+            raise ValueError(f'Environment {env} not recognized.')
+        
         self.decoder_layers = nn.ModuleList(
             [TransformerLayer(config) for _ in range(config.depth)]
         )

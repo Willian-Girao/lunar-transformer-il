@@ -1,5 +1,5 @@
 {   
-    "dataset": "gymnasium-ActorCritic-LunarLander-1000-14-os.pt",
+    "dataset": "gymnasium-SAC-HalfCheetah-1000-14-os.pt",
     "learning_rate": 0.000793,
     "batch_size": 64,
     "data_shuffle": true,
@@ -7,5 +7,5 @@
     "progress": true,
     "subset_dataset": [false, 0],
     "epoch_eval": false,
-    "eval_dataset": "evaluation-gymnasium-ActorCritic-LunarLander-100-12-os.pt"
+    "eval_dataset": ""
 }
