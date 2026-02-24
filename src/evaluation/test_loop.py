@@ -10,6 +10,67 @@ import warnings
 from tqdm import tqdm
 import shutil
 
+def test_within_seed_var(test_cfg, model_dir:str=None) -> None:
+    """
+    """
+    model_dir = 'models' if model_dir is None else model_dir
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+    models_path = os.path.join(project_root, 'results', model_dir)
+
+    env_setup = f'-env_setup-coef_of_var_{test_cfg.env_coef_of_var}'
+    env_setup += f'_seed_{test_cfg.seed_coef_of_var}' if test_cfg.env_coef_of_var != 0 else ''
+
+    # Instantiate model
+    # -------------------------------------------
+    model = load_model(
+        model_id=test_cfg.model_id,
+        model_dir_name=model_dir
+    )
+    device = get_model_device(
+        model_id=test_cfg.model_id,
+        model_dir_name=model_dir
+    )
+
+    # Loading training dataset (prevent data leakage)
+    # -------------------------------------------
+    dataset_name = get_model_dataset(
+        model_id=test_cfg.model_id,
+        model_dir_name=model_dir
+    )
+    dataset = torch.load(os.path.join(project_root, 'data', 'processed', dataset_name), weights_only=False) # dataset (.pt) file used for training.
+
+    # Play env
+    # -------------------------------------------
+    test_iter = range(test_cfg.nb_episodes)
+    progress = tqdm(test_iter, desc=f'within seed variation (seed {test_cfg.env_seed})', unit='', leave=False)
+
+    R_m_s_r = {} # R = reward, m = model, s = seed, r = rollout / episode
+    for r in progress:
+        _, reward_per_step, _, _, _ = play_env(
+            device=device,
+            rand_seed=test_cfg.env_seed,
+            model=model,
+            dataset=dataset,
+            sequence_length=test_cfg.sequence_length,
+            env_coef_of_var=test_cfg.env_coef_of_var,
+            seed_coef_of_var=test_cfg.seed_coef_of_var
+        )
+
+        R_m_s_r[(test_cfg.env_seed, r)] = np.sum(reward_per_step) if test_cfg.reward_per_episode == 'accumulated' else np.array(reward_per_step)
+
+    # Export to file
+    # -------------------------------------------
+    export_path = os.path.join(models_path, test_cfg.model_id, f"within_seed_var-sequence_length_{test_cfg.sequence_length}")
+    os.makedirs(export_path, exist_ok=True)
+
+    with open(
+        os.path.join(
+            export_path,
+            f'env_seed_{test_cfg.env_seed}-seq_len_{test_cfg.sequence_length}-reward_per_episode_{test_cfg.reward_per_episode}{env_setup}.pkl'
+            ), 'wb'
+        ) as file:
+        pickle.dump(R_m_s_r, file)
+
 def test(test_cfg, model_dir:str=None):
     """
     """
@@ -305,6 +366,53 @@ def play_env(device, rand_seed, model, dataset, sequence_length, env_coef_of_var
     env.close()
 
     return frames, reward_per_step, states, terminated, truncated
+
+def play_single_env(config:dict, model_dir:str=None) -> None:
+    """
+    """
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+    model_dir = 'models' if model_dir is None else model_dir
+
+    # Instantiate model
+    # -------------------------------------------
+    model = load_model(model_id=config.model_id, model_dir_name=model_dir)
+    device = get_model_device(model_id=config.model_id, model_dir_name=model_dir)
+
+    # Load model's config
+    # -------------------------------------------
+    chkpt = load_checkpoint(model_id=config.model_id, model_dir_name=model_dir)
+    model_cfg = get_model_cfg_from_checkpoint(checkpoint=chkpt)
+
+    # Loading training dataset (prevent data leakage)
+    # -------------------------------------------
+    dataset_name = get_model_dataset(model_id=config.model_id, model_dir_name=model_dir) # dataset (.pt) file used for training.
+    dataset = torch.load(os.path.join(project_root, 'data', 'processed', dataset_name), weights_only=False)
+
+    # Override existing animations
+    # -------------------------------------------
+    gif_dir = f'animations-sequence_length_{model_cfg.training_seq_len if config.sequence_length == -1 else config.sequence_length}'
+    gif_dir += f'-env_setup-coef_of_var_{config.env_coef_of_var}'
+    gif_dir += f'_seed_{config.seed_coef_of_var}' if config.env_coef_of_var != 0 else ''
+    gif_path = os.path.join(project_root, 'results', model_dir, config.model_id, gif_dir)
+
+    # Simulate env
+    # -------------------------------------------
+
+    # play env
+    frames, reward_per_step, _, _, _ = play_env(
+        device=device,
+        rand_seed=config.rand_seed,
+        model=model,
+        dataset=dataset,
+        sequence_length=model_cfg.training_seq_len if config.sequence_length == -1 else config.sequence_length,
+        env_coef_of_var=config.env_coef_of_var,
+        seed_coef_of_var=config.seed_coef_of_var
+    )
+
+    if config.save_animation:
+        save_animation(
+            frames=frames, path=gif_path, file_name=f'env_seed_{config.rand_seed}_{int(np.sum(reward_per_step))}.gif'
+        )
 
 def test_hpo(test_cfg, model, train_dataset):
     from src.hpo.custom_fitness_functions import evaluate_fitness_with_AUC

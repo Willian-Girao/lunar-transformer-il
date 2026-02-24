@@ -51,11 +51,15 @@ def export_rewards_2_file(
         rewards:dict,
         reward_per_episode:str,
         model_dir:str=None,
-        env_setup:str=''
+        env_setup:str='',
+        experiment_id:str=None
     ) -> None:
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
     model_dir = 'models' if model_dir is None else model_dir
     models_path = os.path.join(project_root, 'results', model_dir, model_id)
+
+    if experiment_id:
+        models_path = os.path.join(models_path, experiment_id)
 
     with open(os.path.join(models_path, f'evaluation-{infer_seq_len}-{model_id}-reward_per_episode_{reward_per_episode}{env_setup}.pkl'), 'wb') as file:
         pickle.dump(rewards, file)

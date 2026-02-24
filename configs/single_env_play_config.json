@@ -1,0 +1,8 @@
+{   
+    "model_id": "ny546",
+    "rand_seed": 1024,
+    "save_animation": true,
+    "env_coef_of_var": 0,
+    "seed_coef_of_var": 0,
+    "sequence_length": 6
+}

@@ -1,0 +1,10 @@
+{   
+    "model_id": "ny546",
+    "starting_seed": 1000,
+    "nb_seeds": 50,
+    "nb_episodes": 10,
+    "env_coef_of_var": 0,
+    "seed_coef_of_var": 0,
+    "reward_per_episode": "all",
+    "sequence_length": 12
+}
