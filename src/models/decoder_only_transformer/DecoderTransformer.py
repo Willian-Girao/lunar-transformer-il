@@ -6,7 +6,7 @@ from src.models.decoder_only_transformer.TransformerLayer import TransformerLaye
 from src.models.noisy_layers.NoisyLinear import NoisyLinear
 
 class DecoderTransformer(nn.Module):
-    def __init__(self, config, env:str):
+    def __init__(self, config, env:str='lunar'): #TODO env should not by default be 'lunar'
         super().__init__()
         torch.manual_seed(config.seed)
         

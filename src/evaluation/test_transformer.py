@@ -17,7 +17,7 @@ def main():
     # Load the test loop configuration file
     # -------------------------------------------
     test_cfg = TestingConfig()
-    test_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.test_json))
+    test_cfg.from_json(json_file=os.path.join(project_root, 'configs', 'testing', args.test_json))
 
     # Test model
     # -------------------------------------------

@@ -14,4 +14,4 @@ args = parser.parse_args()
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) # get the absolute path to the project root.
 os.chdir(project_root) # change working directory to project root.
 
-os.system(f'"{sys.executable}" -m src.training.train_transformer --env {args.env} --transformer_json baseline_cheetah_transformer.json --train_json training_config_baseline.json')
+os.system(f'"{sys.executable}" -m src.training.train_transformer --env {args.env} --transformer_json noise_normal_transformer.json --train_json training_config_noise_normal.json')
