@@ -31,7 +31,7 @@ def main():
     # Load the test loop configuration file
     # -------------------------------------------
     test_cfg = TestingConfig()
-    test_cfg.from_json(json_file=os.path.join(project_root, 'configs', args.test_json))
+    test_cfg.from_json(json_file=os.path.join(project_root, 'configs', 'testing',args.test_json))
 
     test_iter = range(1000, 1000+test_cfg.nb_test_episodes) # TODO: hacky - I'm assuming that the first 1k seeds are used to generate training data. Implement this better.
     progress = tqdm(test_iter, desc=f'Testing expert', unit='env(seed)')
@@ -94,6 +94,7 @@ def main():
 
     export_rewards_2_file(
         model_id='expert',
+        infer_seq_len=0,
         rewards=rewards_per_env_seed,
         reward_per_episode=test_cfg.reward_per_episode,
         model_dir='',

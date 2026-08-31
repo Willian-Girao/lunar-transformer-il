@@ -61,5 +61,9 @@ def export_rewards_2_file(
     if experiment_id:
         models_path = os.path.join(models_path, experiment_id)
 
-    with open(os.path.join(models_path, f'evaluation-{infer_seq_len}-{model_id}-reward_per_episode_{reward_per_episode}{env_setup}.pkl'), 'wb') as file:
-        pickle.dump(rewards, file)
+    if model_id == 'expert':
+        with open(os.path.join(models_path, f'evaluation-{model_id}-reward_per_episode_{reward_per_episode}{env_setup}.pkl'), 'wb') as file:
+            pickle.dump(rewards, file)
+    else:
+        with open(os.path.join(models_path, f'evaluation-{infer_seq_len}-{model_id}-reward_per_episode_{reward_per_episode}{env_setup}.pkl'), 'wb') as file:
+            pickle.dump(rewards, file)

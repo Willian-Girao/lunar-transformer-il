@@ -1,8 +1,8 @@
 {   
-    "model": "10h9c",
+    "model": "ny546",
     "nb_test_episodes": 10,
     "save_animation": true,
-    "env_coef_of_var": 0,
+    "env_coef_of_var": 80,
     "seed_coef_of_var": 0,
     "reward_per_episode": "all",
     "export_to_file": true,
